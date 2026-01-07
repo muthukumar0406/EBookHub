@@ -1,0 +1,15 @@
+.reader-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: #f0f0f0;
+}
+
+.reader-header button {
+    margin-right: 20px;
+}
+
+.loading {
+    text-align: center;
+    padding: 50px;
+}

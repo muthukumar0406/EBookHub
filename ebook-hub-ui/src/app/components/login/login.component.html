@@ -1,0 +1,20 @@
+<div class="login-container">
+    <h2>Ebook Hub Login</h2>
+
+    <div class="admin-login">
+        <h3>Admin Access</h3>
+        <input [(ngModel)]="username" placeholder="Username" />
+        <input [(ngModel)]="password" type="password" placeholder="Password" />
+        <button (click)="loginAdmin()">Login</button>
+    </div>
+
+    <div class="divider">OR</div>
+
+    <div class="user-login">
+        <h3>User Access</h3>
+        <div id="google-btn"></div> <!-- Placeholder for Google Button -->
+        <button (click)="loginUserGoogle()" class="google-btn">Sign in with Google</button>
+    </div>
+
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+</div>

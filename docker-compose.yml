@@ -1,0 +1,47 @@
+services:
+  api:
+    build:
+      context: ./EbookHub.API
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=EbookHubDb;User Id=sa;Password=YourStrong(!)Password;TrustServerCertificate=True;
+    depends_on:
+      - db
+    networks:
+      - ebook-network
+    volumes:
+      - ebook-uploads:/app/Uploads
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong(!)Password
+    ports:
+      - "1433:1433"
+    networks:
+      - ebook-network
+    volumes:
+      - mssql-data:/var/opt/mssql/data
+
+  ui:
+    build:
+      context: ./ebook-hub-ui
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    depends_on:
+      - api
+    networks:
+      - ebook-network
+
+networks:
+  ebook-network:
+    driver: bridge
+
+volumes:
+  mssql-data:
+  ebook-uploads:

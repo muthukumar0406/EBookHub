@@ -1,0 +1,37 @@
+<div class="admin-container">
+    <header>
+        <h2>Admin Dashboard</h2>
+        <button (click)="logout()">Logout</button>
+    </header>
+
+    <div class="upload-section">
+        <h3>Upload New Book</h3>
+        <input [(ngModel)]="title" placeholder="Book Title" />
+        <input [(ngModel)]="author" placeholder="Author" />
+        <input type="file" (change)="onFileSelected($event)" accept=".pdf" />
+        <button (click)="uploadBook()">Upload Book</button>
+        <p *ngIf="message">{{ message }}</p>
+    </div>
+
+    <div class="books-list">
+        <h3>E-Book Collection ({{ books.length }})</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let book of books">
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.author }}</td>
+                    <td>
+                        <button class="delete-btn" (click)="deleteBook(book.id)">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

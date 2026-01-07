@@ -1,0 +1,14 @@
+<div class="app-container">
+    <nav *ngIf="isLoggedIn()">
+        <h1>Ebook Hub</h1>
+        <div class="nav-links">
+            <a routerLink="/library" routerLinkActive="active">Library</a>
+            <a routerLink="/admin" *ngIf="isAdmin()" routerLinkActive="active">Admin</a>
+            <a (click)="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <router-outlet></router-outlet>
+    </div>
+</div>

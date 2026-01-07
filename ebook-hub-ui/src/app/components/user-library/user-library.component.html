@@ -1,0 +1,13 @@
+<div class="library-container">
+    <div class="search-bar">
+        <input [(ngModel)]="searchTerm" (input)="search()" placeholder="Search books..." />
+    </div>
+
+    <div class="book-grid">
+        <div *ngFor="let book of filteredBooks" class="book-card" (click)="openBook(book.id)">
+            <div class="book-icon">📖</div>
+            <h3>{{ book.title }}</h3>
+            <p>{{ book.author }}</p>
+        </div>
+    </div>
+</div>

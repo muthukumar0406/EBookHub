@@ -1,0 +1,16 @@
+# General
+.DS_Store
+.vscode/
+*.log
+
+# Node
+node_modules/
+dist/
+/ebook-hub-ui/.angular/
+
+# .NET
+**/bin/
+**/obj/
+.vs/
+*.user
+serviceAccountKey.json

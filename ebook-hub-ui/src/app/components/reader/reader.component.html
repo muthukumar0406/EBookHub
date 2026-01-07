@@ -1,0 +1,13 @@
+<div class="reader-container" *ngIf="pdfSrc">
+    <div class="reader-header">
+        <button routerLink="/library">Back to Library</button>
+        <h3>{{ book?.title }}</h3>
+    </div>
+
+    <ngx-extended-pdf-viewer [src]="pdfSrc" height="90vh">
+    </ngx-extended-pdf-viewer>
+</div>
+
+<div *ngIf="!pdfSrc" class="loading">
+    <p>Loading book...</p>
+</div>
