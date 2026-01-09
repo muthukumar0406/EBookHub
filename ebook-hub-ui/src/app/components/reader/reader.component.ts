@@ -20,14 +20,24 @@ export class ReaderComponent implements OnInit {
     constructor(private route: ActivatedRoute, private bookService: BookService) { }
 
     ngOnInit(): void {
-        this.bookId = Number(this.route.snapshot.paramMap.get('id'));
+        const idParam = this.route.snapshot.paramMap.get('id');
+        this.bookId = idParam ? Number(idParam) : null;
+
         if (this.bookId) {
-            this.bookService.getBooks().subscribe(books => {
-                this.book = books.find(b => b.id === this.bookId) || null;
-                if (this.book) {
-                    const baseUrl = environment.apiUrl.replace('/api', '');
-                    this.pdfSrc = `${baseUrl}/uploads/${this.book.fileName}`;
-                    console.log('Opening PDF from:', this.pdfSrc);
+            this.bookService.getBooks().subscribe({
+                next: (books) => {
+                    this.book = books.find(b => b.id === this.bookId) || null;
+                    if (this.book) {
+                        // Correctly pointing to the backend's static file serving endpoint
+                        const baseUrl = environment.apiUrl.replace('/api', '');
+                        this.pdfSrc = `${baseUrl}/uploads/${this.book.fileName}`;
+                        console.log('Opening PDF from:', this.pdfSrc);
+                    } else {
+                        console.error('Book not found in library');
+                    }
+                },
+                error: (err) => {
+                    console.error('Error loading book details:', err);
                 }
             });
         }

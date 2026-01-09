@@ -104,3 +104,28 @@ tr:last-child td {
 .btn-secondary:hover {
     background: var(--border);
 }
+
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 1.5rem;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .input-container {
+        width: 100%;
+    }
+
+    .book-table-container {
+        overflow-x: auto;
+    }
+}

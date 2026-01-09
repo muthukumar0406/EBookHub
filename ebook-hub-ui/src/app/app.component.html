@@ -1,10 +1,19 @@
 <div class="app-container">
-    <nav *ngIf="userStatus | async as user">
-        <h1>Ebook Hub</h1>
+    <nav *ngIf="userStatus | async as user" class="navbar">
+        <div class="nav-brand">
+            <span class="logo-emoji">📚</span>
+            <h1>Ebook Hub</h1>
+        </div>
         <div class="nav-links">
-            <a routerLink="/library" routerLinkActive="active">Library</a>
-            <a routerLink="/admin" *ngIf="user.role === 'Admin'" routerLinkActive="active">Admin</a>
-            <a (click)="logout()" class="logout-link">Logout</a>
+            <a routerLink="/library" routerLinkActive="active" class="nav-item">
+                <i class="icon-library"></i> Library
+            </a>
+            <a routerLink="/admin" *ngIf="user.role === 'Admin'" routerLinkActive="active" class="nav-item">
+                <i class="icon-admin"></i> Admin
+            </a>
+            <button (click)="logout()" class="logout-btn">
+                <span>Logout</span>
+            </button>
         </div>
     </nav>
 

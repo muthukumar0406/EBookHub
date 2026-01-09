@@ -47,6 +47,12 @@ RUN echo 'server { \
         proxy_set_header Host $host; \
         proxy_cache_bypass $http_upgrade; \
     } \
+    location /uploads/ { \
+        proxy_pass http://api:8080/uploads/; \
+        proxy_http_version 1.1; \
+        proxy_set_header Host $host; \
+        proxy_cache_bypass $http_upgrade; \
+    } \
 }' > /etc/nginx/conf.d/default.conf
 
 EXPOSE 80

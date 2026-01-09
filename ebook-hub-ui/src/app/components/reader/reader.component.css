@@ -1,15 +1,69 @@
+.reader-container {
+    height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+}
+
 .reader-header {
     display: flex;
     align-items: center;
-    padding: 10px;
-    background: #f0f0f0;
+    gap: 1.5rem;
+    padding: 1rem 1.5rem;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
 }
 
-.reader-header button {
-    margin-right: 20px;
+.reader-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.back-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary);
 }
 
 .loading {
-    text-align: center;
-    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    color: var(--text-muted);
+}
+
+.loading p {
+    font-size: 1.1rem;
+    margin-top: 1rem;
+}
+
+ngx-extended-pdf-viewer {
+    flex: 1;
+}
+
+@media (max-width: 640px) {
+    .reader-header {
+        padding: 0.75rem 1rem;
+        gap: 1rem;
+    }
+
+    .reader-header h3 {
+        font-size: 1rem;
+    }
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BookService, Book } from '../../services/book.service';
+import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -16,15 +17,33 @@ export class UserLibraryComponent implements OnInit {
     filteredBooks: Book[] = [];
     searchTerm = '';
 
-    constructor(private bookService: BookService, private router: Router) { }
+    constructor(
+        private bookService: BookService,
+        private authService: AuthService,
+        private router: Router
+    ) { }
 
     ngOnInit(): void {
+        // Load immediately if we already have user info
+        if (this.authService.currentUserValue) {
+            this.loadBooks();
+        }
+
+        // Also subscribe to ensure it loads after a fresh login
+        this.authService.currentUser$.subscribe(user => {
+            if (user && this.books.length === 0) {
+                this.loadBooks();
+            }
+        });
+    }
+
+    loadBooks() {
         this.bookService.getBooks().subscribe({
             next: (data) => {
                 this.books = data;
                 this.filteredBooks = data;
             },
-            error: (err) => console.error(err)
+            error: (err) => console.error('Error loading books:', err)
         });
     }
 
