@@ -73,9 +73,10 @@ try
     {
         FirebaseAdmin.FirebaseApp.Create(new FirebaseAdmin.AppOptions
         {
-            Credential = Google.Apis.Auth.OAuth2.GoogleCredential.FromFile(keyPath)
+            Credential = Google.Apis.Auth.OAuth2.GoogleCredential.FromFile(keyPath),
+            ProjectId = builder.Configuration["Firebase:ProjectId"]
         });
-        Console.WriteLine("Firebase Admin SDK initialized using serviceAccountKey.json");
+        Console.WriteLine($"Firebase Admin SDK initialized using {keyPath} for project {builder.Configuration["Firebase:ProjectId"]}");
     }
     else
     {
@@ -111,7 +112,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowAngular");
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 // Serve Static Files (PDFs)
 var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "Uploads");

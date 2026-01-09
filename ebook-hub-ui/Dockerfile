@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application code
 COPY . .
@@ -35,6 +35,7 @@ RUN echo 'server { \
     server_name localhost; \
     root /usr/share/nginx/html; \
     index index.html index.htm; \
+    add_header Cross-Origin-Opener-Policy same-origin-allow-popups; \
     location / { \
         try_files $uri $uri/ /index.html; \
     } \

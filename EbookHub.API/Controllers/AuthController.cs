@@ -75,11 +75,12 @@ namespace EbookHub.API.Controllers
             }
             catch (Exception ex)
             {
-                // Fallback for demo if SDK fails due to missing credentials on server
-                // CAUTION: This fallback is insecure and strictly for dev environment where setup might be incomplete
-                // In production, remove this fallback.
-                Console.WriteLine($"Token verification failed: {ex.Message}");
-                return Unauthorized($"Invalid Token or Verification Failed: {ex.Message}");
+                Console.WriteLine($"[Auth] Token verification failed: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"[Auth] Inner error: {ex.InnerException.Message}");
+                }
+                return Unauthorized(new { Error = "Token verification failed", Details = ex.Message });
             }
         }
 
