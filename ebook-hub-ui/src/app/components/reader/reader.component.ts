@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer'; // Ensure this is installed
 import { BookService, Book } from '../../services/book.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-reader',
@@ -24,9 +25,9 @@ export class ReaderComponent implements OnInit {
             this.bookService.getBooks().subscribe(books => {
                 this.book = books.find(b => b.id === this.bookId) || null;
                 if (this.book) {
-                    // Assuming filePath coming from backend is relative or needs full URL prefix
-                    // API uses static files at /uploads
-                    this.pdfSrc = `http://localhost:5037/uploads/${this.book.filePath}`;
+                    const baseUrl = environment.apiUrl.replace('/api', '');
+                    this.pdfSrc = `${baseUrl}/uploads/${this.book.fileName}`;
+                    console.log('Opening PDF from:', this.pdfSrc);
                 }
             });
         }

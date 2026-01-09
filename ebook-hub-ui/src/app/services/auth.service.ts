@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Auth, GoogleAuthProvider, authState, idToken, signInWithPopup, signOut } from '@angular/fire/auth';
-import { Observable, from, map, tap, switchMap, of } from 'rxjs';
+import { BehaviorSubject, Observable, from, map, tap, switchMap, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -14,13 +14,22 @@ export class AuthService {
     private http = inject(HttpClient);
     private apiUrl = `${environment.apiUrl}/auth`;
 
+    private currentUserSubject = new BehaviorSubject<{ token: string; role: string } | null>(null);
+    public currentUser$ = this.currentUserSubject.asObservable();
+
     // Expose the current user directly from Firebase
     user$ = authState(this.auth);
 
     // Signal or Observable for the token
     idToken$ = idToken(this.auth);
 
-    constructor() { }
+    constructor() {
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+        if (token && role) {
+            this.currentUserSubject.next({ token, role });
+        }
+    }
 
     // Restore currentUserValue for backward compatibility (used by BookService and App)
     get currentUserValue(): { token: string; role: string } | null {
@@ -36,9 +45,9 @@ export class AuthService {
     login(credentials: any): Observable<any> {
         return this.http.post(`${this.apiUrl}/admin-login`, credentials).pipe(
             tap((response: any) => {
-                // Store token if needed, or handle as per existing Admin flow
                 localStorage.setItem('token', response.token);
                 localStorage.setItem('role', response.role);
+                this.currentUserSubject.next({ token: response.token, role: response.role });
             })
         );
     }
@@ -63,9 +72,15 @@ export class AuthService {
                 });
             }),
             tap((response: any) => {
-                localStorage.setItem('token', response.token); // Backend JWT
+                localStorage.setItem('token', response.token);
                 localStorage.setItem('role', response.role);
-                this.router.navigate(['/']);
+                this.currentUserSubject.next({ token: response.token, role: response.role });
+
+                if (response.role === 'Admin') {
+                    this.router.navigate(['/admin']);
+                } else {
+                    this.router.navigate(['/library']);
+                }
             }),
             map(() => void 0)
         );
@@ -76,6 +91,7 @@ export class AuthService {
             tap(() => {
                 localStorage.removeItem('token');
                 localStorage.removeItem('role');
+                this.currentUserSubject.next(null);
                 this.router.navigate(['/login']);
             })
         );

@@ -1,10 +1,10 @@
 <div class="app-container">
-    <nav *ngIf="isLoggedIn()">
+    <nav *ngIf="userStatus | async as user">
         <h1>Ebook Hub</h1>
         <div class="nav-links">
             <a routerLink="/library" routerLinkActive="active">Library</a>
-            <a routerLink="/admin" *ngIf="isAdmin()" routerLinkActive="active">Admin</a>
-            <a (click)="logout()">Logout</a>
+            <a routerLink="/admin" *ngIf="user.role === 'Admin'" routerLinkActive="active">Admin</a>
+            <a (click)="logout()" class="logout-link">Logout</a>
         </div>
     </nav>
 

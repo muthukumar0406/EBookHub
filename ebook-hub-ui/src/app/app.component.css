@@ -41,8 +41,15 @@ nav h1 {
     color: #4285F4;
 }
 
-.nav-links a:hover {
+.nav-links a:hover,
+.logout-link:hover {
     color: #333;
+}
+
+.logout-link {
+    color: #e74c3c !important;
+    /* Red color for logout */
+    font-weight: 600;
 }
 
 .content {

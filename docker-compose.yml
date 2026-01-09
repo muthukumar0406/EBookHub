@@ -9,8 +9,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=db;Database=EbookHubDb;User Id=sa;Password=YourStrong(!)Password;TrustServerCertificate=True;
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     networks:
       - ebook-network
     volumes:
@@ -18,14 +17,15 @@ services:
 
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=YourStrong(!)Password
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong(!)Password' -Q 'SELECT 1' -b -C"]
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong(!)Password' -Q 'SELECT 1' -b"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
     ports:
       - "1433:1433"
     networks:

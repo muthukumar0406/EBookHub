@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from './services/auth.service';
@@ -12,8 +12,9 @@ import { AuthService } from './services/auth.service';
 })
 export class AppComponent {
     protected readonly title = signal('ebook-hub-ui');
+    private authService = inject(AuthService);
 
-    constructor(private authService: AuthService) { }
+    userStatus = this.authService.currentUser$;
 
     isLoggedIn(): boolean {
         return !!this.authService.currentUserValue;
@@ -24,6 +25,6 @@ export class AppComponent {
     }
 
     logout() {
-        this.authService.logout();
+        this.authService.logout().subscribe();
     }
 }

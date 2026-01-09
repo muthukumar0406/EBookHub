@@ -10,5 +10,9 @@ export const routes: Routes = [
     { path: 'admin', component: AdminDashboardComponent },
     { path: 'library', component: UserLibraryComponent },
     { path: 'read/:id', component: ReaderComponent },
-    { path: '', redirectTo: '/login', pathMatch: 'full' }
+    {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'library'
+    }
 ];
