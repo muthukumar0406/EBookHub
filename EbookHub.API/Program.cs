@@ -47,15 +47,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
-    var projectId = builder.Configuration["Firebase:ProjectId"];
-    options.Authority = $"https://securetoken.google.com/{projectId}";
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidIssuer = $"https://securetoken.google.com/{projectId}",
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidateAudience = true,
-        ValidAudience = projectId,
-        ValidateLifetime = true
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
 });
 

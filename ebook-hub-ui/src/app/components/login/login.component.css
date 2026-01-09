@@ -1,31 +1,116 @@
-.login-container {
-    max-width: 400px;
-    margin: 50px auto;
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top left, #1e293b 0%, #0f172a 100%);
     padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    border-radius: 24px;
     text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-input {
+.brand {
+    margin-bottom: 32px;
+}
+
+.logo-icon {
+    font-size: 48px;
     display: block;
-    width: 90%;
-    margin: 10px auto;
+    margin-bottom: 12px;
+}
+
+.brand h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+.brand p {
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.login-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.divider {
+    position: relative;
+    text-align: center;
+    margin: 8px 0;
+}
+
+.divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border);
+}
+
+.divider span {
+    position: relative;
+    background: var(--bg-card);
+    padding: 0 12px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.google-login-btn {
+    width: 100%;
+    background: white;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: background 0.2s;
+}
+
+.google-login-btn:hover {
+    background: #f9fafb;
+}
+
+.google-login-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+.error-toast {
+    margin-top: 20px;
+    color: #f87171;
+    background: rgba(220, 38, 38, 0.1);
     padding: 10px;
-}
-
-button {
-    padding: 10px 20px;
-    margin-top: 10px;
-    cursor: pointer;
-}
-
-.google-btn {
-    background-color: #4285F4;
-    color: white;
-    border: none;
-}
-
-.error {
-    color: red;
+    border-radius: 8px;
+    font-size: 14px;
 }

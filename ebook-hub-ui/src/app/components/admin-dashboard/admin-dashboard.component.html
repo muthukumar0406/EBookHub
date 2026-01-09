@@ -1,37 +1,53 @@
 <div class="admin-container">
     <header>
-        <h2>Admin Dashboard</h2>
-        <button (click)="logout()">Logout</button>
+        <div class="header-content">
+            <h2>Admin Dashboard</h2>
+            <p class="subtitle">Manage your ebook library</p>
+        </div>
+        <button (click)="logout()" class="btn-secondary">Logout</button>
     </header>
 
-    <div class="upload-section">
+    <div class="upload-section glass">
         <h3>Upload New Book</h3>
-        <input [(ngModel)]="title" placeholder="Book Title" />
-        <input [(ngModel)]="author" placeholder="Author" />
-        <input type="file" (change)="onFileSelected($event)" accept=".pdf" />
-        <button (click)="uploadBook()">Upload Book</button>
-        <p *ngIf="message">{{ message }}</p>
+        <div class="form-row">
+            <div class="input-container">
+                <label>Book Title</label>
+                <input [(ngModel)]="title" placeholder="Enter book title" />
+            </div>
+            <div class="input-container">
+                <label>Author Name</label>
+                <input [(ngModel)]="author" placeholder="Enter author name" />
+            </div>
+            <div class="input-container">
+                <label>PDF File</label>
+                <input type="file" (change)="onFileSelected($event)" accept=".pdf" />
+            </div>
+            <button (click)="uploadBook()" class="btn-primary">Upload Book</button>
+        </div>
+        <p *ngIf="message" class="message-toast">{{ message }}</p>
     </div>
 
     <div class="books-list">
         <h3>E-Book Collection ({{ books.length }})</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let book of books">
-                    <td>{{ book.title }}</td>
-                    <td>{{ book.author }}</td>
-                    <td>
-                        <button class="delete-btn" (click)="deleteBook(book.id)">Delete</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="book-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let book of books">
+                        <td><strong>{{ book.title }}</strong></td>
+                        <td>{{ book.author }}</td>
+                        <td style="text-align: right;">
+                            <button class="delete-btn" (click)="deleteBook(book.id)">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

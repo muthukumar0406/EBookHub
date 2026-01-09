@@ -1,87 +1,93 @@
-# Ebook Hub
+# Ebook Hub 📚
 
-A complete eBook platform with a .NET Web API backend and an Angular frontend.
-
-## 🚀 Quick Start Guide
-
-### Prerequisites
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [Node.js 20+](https://nodejs.org/)
-- [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) (Express or LocalDB)
-- [Firebase account](https://console.firebase.google.com/)
+A complete eBook platform featuring a **.NET 8 Web API** backend, **Angular 19+** frontend, and **SQL Server** database.
 
 ---
+
+## 🔑 Admin Credentials
+- **Username:** `Muthukumar`
+- **Password:** `Admin@kumar`
+- **User Login:** Use Google Sign-In (Firebase)
+
+---
+
+## 🚀 Quick Start Guide (Windows/Local)
 
 ### 🛠️ Configuration
-
-1. **Firebase**: 
-   - Get your Firebase Config object from the Firebase Console.
+1. **Firebase Setup**: 
+   - Get your Firebase Config from the Console.
    - Update `ebook-hub-ui/src/environments/environment.ts`.
-   - Download your **Service Account Key JSON** from Project Settings > Service Accounts.
-   - Place the file as `serviceAccountKey.json` in the **root** of this project. (It is already ignored by git to keep it secure).
+2. **Service Account Key**:
+   - Download `serviceAccountKey.json` from Firebase.
+   - Place it in the `EbookHub.API/` directory.
 
-2. **Database**:
-   - The API uses SQL Server. Update the connection string in `EbookHub.API/appsettings.json` if needed.
-   - The database will be created automatically on the first run.
-
----
-
-### 🏃 How to Run
-
-#### Option 1: Docker (Easiest)
-1. Ensure Docker Desktop is running.
-2. Run in the root folder:
-   ```bash
-   docker-compose up --build
-   ```
-3. Access:
-   - UI: [http://localhost:4200](http://localhost:4200)
-   - API Swagger: [http://localhost:5000/swagger](http://localhost:5000/swagger)
-
-#### Option 2: Local Development
-1. **Backend**:
-   ```bash
-   cd EbookHub.API
-   dotnet run
-   ```
-2. **Frontend**:
-   ```bash
-   cd ebook-hub-ui
-   npm install
-   npm start
-   ```
+### 🏃 Running with Docker
+```bash
+docker-compose up --build
+```
+- **UI:** [http://localhost:4200](http://localhost:4200)
+- **API:** [http://localhost:5000/api](http://localhost:5000/api)
 
 ---
 
-### ⬆️ How to Push to GitHub
+## ⬆️ Step 1: Push to GitHub (Windows PowerShell)
 
-1. **Create a Repository** on GitHub (do not initialize with README/License).
-2. **Initialize Git locally** (if not already done):
-   ```bash
+1. Open PowerShell in the project root.
+2. Create a new repo on GitHub.
+3. Run these commands:
+   ```powershell
    git init
-   ```
-3. **Add all files**:
-   ```bash
    git add .
-   ```
-4. **Commit**:
-   ```bash
-   git commit -m "Initial commit: Ebook Hub complete project"
-   ```
-5. **Link and Push**:
-   ```bash
-   # Replace with your actual repo URL
-   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+   git commit -m "Complete Ebook Hub with fixed Auth and UI"
    git branch -M main
+   git remote add origin https://github.com/muthukumar0406/EbookHub.git  # Replace with your repo URL
    git push -u origin main
    ```
 
-> [!CAUTION]
-> **Check your .gitignore**: Ensure `serviceAccountKey.json` and `node_modules` are ignored before pushing! I have already pre-configured the `.gitignore` for you.
+---
+
+## 🌍 Step 2: Deploy to Ubuntu Server
+
+1. **Connect to your server**:
+   ```bash
+   ssh root@160.187.68.165
+   ```
+2. **Install Docker** (if not already installed):
+   ```bash
+   sudo apt update
+   sudo apt install docker.io docker-compose -y
+   ```
+3. **Clone the Repo**:
+   ```bash
+   git clone https://github.com/muthukumar0406/EbookHub.git
+   cd EbookHub
+   ```
+4. **IMPORTANT: Upload Firebase Key**:
+   Since `serviceAccountKey.json` is ignored by git, you must upload it to the server manually:
+   ```bash
+   # (Run this FROM YOUR LOCAL WINDOWS MACHINE)
+   scp ./EbookHub.API/serviceAccountKey.json root@160.187.68.165:/root/EbookHub/EbookHub.API/
+   ```
+5. **Run the Project**:
+   ```bash
+   docker-compose up -d --build
+   ```
+6. **Access your site**:
+   - Open browser: `http://160.187.68.165`
 
 ---
 
 ## 📂 Project Structure
-- `EbookHub.API`: .NET 8 Web API
-- `ebook-hub-ui`: Angular 19+ (Standalone setup)
-- `docker-compose.yml`: Full stack orchestration
+- `EbookHub.API`: Backend API (.NET 8)
+- `ebook-hub-ui`: Frontend UI (Angular 19+ with Nginx proxy)
+- `docker-compose.yml`: Full stack orchestration (API + UI + SQL Server)
+
+---
+
+## ✅ Features Fixed
+- [x] Admin Login with specific credentials.
+- [x] Google Login with Firebase verified by backend.
+- [x] JWT Token compatibility for both Admin and User roles.
+- [x] Modernized Premium UI with Glassmorphism and Inter Font.
+- [x] Author field added to Books across Database and UI.
+- [x] Docker Nginx Proxy (UI on 80, API on 5000).

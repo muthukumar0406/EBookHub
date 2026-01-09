@@ -1,20 +1,36 @@
-<div class="login-container">
-    <h2>Ebook Hub Login</h2>
+<div class="login-wrapper">
+    <div class="login-card glass">
+        <div class="brand">
+            <span class="logo-icon">📚</span>
+            <h1>Ebook Hub</h1>
+            <p>Your digital library vault</p>
+        </div>
 
-    <div class="admin-login">
-        <h3>Admin Access</h3>
-        <input [(ngModel)]="username" placeholder="Username" />
-        <input [(ngModel)]="password" type="password" placeholder="Password" />
-        <button (click)="loginAdmin()">Login</button>
+        <div class="login-sections">
+            <section class="admin-section">
+                <h3>Admin Portal</h3>
+                <div class="input-group">
+                    <input [(ngModel)]="username" placeholder="Username" />
+                </div>
+                <div class="input-group">
+                    <input [(ngModel)]="password" type="password" placeholder="Password" />
+                </div>
+                <button (click)="loginAdmin()" class="btn-primary full-width">Admin Login</button>
+            </section>
+
+            <div class="divider">
+                <span>or</span>
+            </div>
+
+            <section class="user-section">
+                <h3>Readers Area</h3>
+                <button (click)="loginUserGoogle()" class="google-login-btn">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                    Continue with Google
+                </button>
+            </section>
+        </div>
+
+        <p *ngIf="errorMessage" class="error-toast">{{ errorMessage }}</p>
     </div>
-
-    <div class="divider">OR</div>
-
-    <div class="user-login">
-        <h3>User Access</h3>
-        <div id="google-btn"></div> <!-- Placeholder for Google Button -->
-        <button (click)="loginUserGoogle()" class="google-btn">Sign in with Google</button>
-    </div>
-
-    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
 </div>

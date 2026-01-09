@@ -13,4 +13,4 @@ dist/
 **/obj/
 .vs/
 *.user
-serviceAccountKey.json
+EbookHub.API/serviceAccountKey.json

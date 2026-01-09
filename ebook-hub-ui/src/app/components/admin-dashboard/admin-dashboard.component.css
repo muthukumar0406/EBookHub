@@ -1,25 +1,51 @@
 .admin-container {
-    padding: 20px;
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
+    margin-bottom: 40px;
 }
 
 .upload-section {
-    background: #f9f9f9;
-    padding: 20px;
-    margin: 20px 0;
-    border-radius: 8px;
+    background: var(--bg-card);
+    padding: 30px;
+    margin-bottom: 40px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
 }
 
-.upload-section input {
-    margin-right: 10px;
-    padding: 8px;
+.upload-section h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.input-container {
+    flex: 1;
+}
+
+.input-container label {
+    display: block;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.book-table-container {
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
 }
 
 table {
@@ -27,17 +53,54 @@ table {
     border-collapse: collapse;
 }
 
+th {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-muted);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
 th,
 td {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
+    padding: 16px 24px;
     text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+tr:last-child td {
+    border-bottom: none;
 }
 
 .delete-btn {
-    background-color: #ff4444;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.delete-btn:hover {
+    background-color: #ef4444;
     color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
+}
+
+.message-toast {
+    margin-top: 15px;
+    color: var(--primary);
+    font-size: 14px;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 8px 16px;
+    border-radius: 8px;
+}
+
+.btn-secondary:hover {
+    background: var(--border);
 }

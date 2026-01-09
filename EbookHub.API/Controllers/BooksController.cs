@@ -44,7 +44,7 @@ namespace EbookHub.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UploadBook([FromForm] IFormFile file, [FromForm] string title)
+        public async Task<IActionResult> UploadBook([FromForm] IFormFile file, [FromForm] string title, [FromForm] string author)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
@@ -68,6 +68,7 @@ namespace EbookHub.API.Controllers
             var book = new Book
             {
                 Title = title,
+                Author = author,
                 FileName = uniqueFileName,
                 UploadDate = DateTime.UtcNow
             };

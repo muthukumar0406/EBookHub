@@ -10,6 +10,9 @@ namespace EbookHub.API.Models
         public string Title { get; set; } = string.Empty;
 
         [Required]
+        public string Author { get; set; } = string.Empty;
+
+        [Required]
         public string FileName { get; set; } = string.Empty;
 
         public DateTime UploadDate { get; set; } = DateTime.UtcNow;
