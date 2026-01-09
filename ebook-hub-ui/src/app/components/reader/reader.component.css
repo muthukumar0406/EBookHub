@@ -53,6 +53,27 @@
     margin-top: 1rem;
 }
 
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    padding: 2rem;
+    text-align: center;
+    gap: 1.5rem;
+}
+
+.error-container p {
+    font-size: 1.25rem;
+    color: #ef4444;
+}
+
+.debug-hint {
+    font-family: monospace;
+    color: var(--text-muted);
+}
+
 ngx-extended-pdf-viewer {
     flex: 1;
 }

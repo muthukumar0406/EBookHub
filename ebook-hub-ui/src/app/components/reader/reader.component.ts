@@ -16,30 +16,48 @@ export class ReaderComponent implements OnInit {
     bookId: number | null = null;
     book: Book | null = null;
     pdfSrc: string | undefined;
+    errorMessage: string | null = null;
 
     constructor(private route: ActivatedRoute, private bookService: BookService) { }
 
     ngOnInit(): void {
+        this.errorMessage = null;
+        this.pdfSrc = undefined;
         const idParam = this.route.snapshot.paramMap.get('id');
+        console.log('ReaderComponent: idParam =', idParam);
         this.bookId = idParam ? Number(idParam) : null;
 
-        if (this.bookId) {
-            this.bookService.getBooks().subscribe({
-                next: (books) => {
-                    this.book = books.find(b => b.id === this.bookId) || null;
-                    if (this.book) {
+        if (this.bookId && !isNaN(this.bookId)) {
+            this.bookService.getBook(this.bookId).subscribe({
+                next: (book) => {
+                    console.log('ReaderComponent: Book fetched successfully', book);
+                    this.book = book;
+                    if (this.book && this.book.fileName) {
                         // Correctly pointing to the backend's static file serving endpoint
                         const baseUrl = environment.apiUrl.replace('/api', '');
-                        this.pdfSrc = `${baseUrl}/uploads/${this.book.fileName}`;
-                        console.log('Opening PDF from:', this.pdfSrc);
+                        // Use encodeURIComponent just in case the filename has spaces or special chars
+                        const safeFileName = encodeURIComponent(this.book.fileName);
+                        this.pdfSrc = `${baseUrl}/uploads/${this.book.fileName}`; // Use raw fileName first as it includes the UID
+
+                        // If it has spaces, the browser usually handles it but let's be safe
+                        if (this.book.fileName.includes(' ')) {
+                            this.pdfSrc = `${baseUrl}/uploads/${encodeURI(this.book.fileName)}`;
+                        }
+
+                        console.log('ReaderComponent: Setting pdfSrc to:', this.pdfSrc);
                     } else {
-                        console.error('Book not found in library');
+                        this.errorMessage = 'Book not found in library';
+                        console.error('ReaderComponent: Book found but has no fileName');
                     }
                 },
                 error: (err) => {
-                    console.error('Error loading book details:', err);
+                    this.errorMessage = 'Could not load book details. Please check if the server is running.';
+                    console.error('ReaderComponent: Error loading book by ID:', err);
                 }
             });
+        } else {
+            this.errorMessage = 'Invalid book ID provided.';
+            console.error('ReaderComponent: Invalid bookId:', this.bookId);
         }
     }
 }
