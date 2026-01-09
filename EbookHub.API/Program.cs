@@ -131,22 +131,32 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Auto-migrate database
+// Auto-migrate database with retry logic
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    // This will create the database if it doesn't exist and apply any pending migrations
-    // If you are not using Migrations, use dbContext.Database.EnsureCreated();
-    // For now, using EnsureCreated for simplicity in a quick-start scenario, 
-    // but ideally use Migrate() if migrations are present.
-    try 
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    
+    int maxRetries = 10;
+    int delay = 3000; // 3 seconds
+
+    for (int i = 0; i < maxRetries; i++)
     {
-        dbContext.Database.EnsureCreated();
-    }
-    catch (Exception ex)
-    {
-        // Log error or just continue, DB might not be ready yet
-        Console.WriteLine($"Database initialization failed: {ex.Message}");
+        try 
+        {
+            dbContext.Database.EnsureCreated();
+            logger.LogInformation("Database initialization successful.");
+            break;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning($"Database initialization attempt {i + 1} failed: {ex.Message}. Retrying in {delay/1000}s...");
+            if (i == maxRetries - 1)
+            {
+                logger.LogError($"Database could not be initialized after {maxRetries} attempts: {ex.Message}");
+            }
+            Thread.Sleep(delay);
+        }
     }
 }
 
