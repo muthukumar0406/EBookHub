@@ -20,7 +20,7 @@ namespace EbookHub.API.Controllers
         }
 
         [HttpGet]
-        [Authorize] // Both Admin and User can view
+        [AllowAnonymous] // Temporarily allow anonymous for debugging
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks([FromQuery] string? search)
         {
             var query = _context.Books.AsQueryable();

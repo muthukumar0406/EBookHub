@@ -1,17 +1,36 @@
 <div class="library-container">
+    <!-- Search Bar -->
     <div class="search-bar">
-        <input [(ngModel)]="searchTerm" (input)="search()" placeholder="Search books..." />
+        <input [(ngModel)]="searchTerm" (input)="search()" placeholder="Search your books..." />
     </div>
 
-    <div class="book-grid">
+    <!-- Active Loading State -->
+    <div *ngIf="isLoading && books.length === 0" class="status-message">
+        <div class="spinner"></div>
+        <p>Fetching your library...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="errorMessage" class="status-message error">
+        <p>⚠️ {{ errorMessage }}</p>
+        <button (click)="loadBooks()" class="btn-retry">Try Again</button>
+    </div>
+
+    <!-- Book Grid -->
+    <div class="book-grid" *ngIf="!isLoading || books.length > 0">
         <div *ngFor="let book of filteredBooks" class="book-card" (click)="openBook(book.id)">
             <div class="book-cover">
-                <img *ngIf="book.coverImageName" [src]="uploadsUrl + '/' + book.coverImageName" alt="Book cover" />
+                <img *ngIf="book.coverImageName" [src]="uploadsUrl + '/' + book.coverImageName" [alt]="book.title" />
                 <div *ngIf="!book.coverImageName" class="book-icon">📖</div>
             </div>
             <div class="book-info">
                 <h3>{{ book.title }}</h3>
             </div>
         </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && books.length === 0 && !errorMessage" class="status-message empty">
+        <p>Your library is currently empty. Start by uploading some books!</p>
     </div>
 </div>
