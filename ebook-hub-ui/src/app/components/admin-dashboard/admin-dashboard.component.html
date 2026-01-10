@@ -19,8 +19,12 @@
                 <input [(ngModel)]="author" placeholder="Enter author name" />
             </div>
             <div class="input-container">
-                <label>PDF File</label>
-                <input type="file" (change)="onFileSelected($event)" accept=".pdf" />
+                <label>Book File (PDF, HTML, etc.)</label>
+                <input type="file" (change)="onFileSelected($event)" />
+            </div>
+            <div class="input-container">
+                <label>Cover Image</label>
+                <input type="file" (change)="onCoverSelected($event)" accept="image/*" />
             </div>
             <button (click)="uploadBook()" class="btn-primary">Upload Book</button>
         </div>

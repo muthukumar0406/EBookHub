@@ -8,6 +8,7 @@ export interface Book {
     title: string;
     author: string;
     fileName: string; // Matches 'FileName' from C#
+    coverImageName?: string;
     uploadDate: string;
 }
 

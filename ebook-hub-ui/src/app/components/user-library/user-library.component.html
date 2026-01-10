@@ -5,9 +5,14 @@
 
     <div class="book-grid">
         <div *ngFor="let book of filteredBooks" class="book-card" (click)="openBook(book.id)">
-            <div class="book-icon">📖</div>
-            <h3>{{ book.title }}</h3>
-            <p>{{ book.author }}</p>
+            <div class="book-cover">
+                <img *ngIf="book.coverImageName" [src]="uploadsUrl + '/' + book.coverImageName" alt="Book cover" />
+                <div *ngIf="!book.coverImageName" class="book-icon">📖</div>
+            </div>
+            <div class="book-info">
+                <h3>{{ book.title }}</h3>
+                <p>{{ book.author }}</p>
+            </div>
         </div>
     </div>
 </div>

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { BookService, Book } from '../../services/book.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-user-library',
@@ -16,6 +17,7 @@ export class UserLibraryComponent implements OnInit {
     books: Book[] = [];
     filteredBooks: Book[] = [];
     searchTerm = '';
+    uploadsUrl = environment.apiUrl.replace('/api', '/uploads');
 
     constructor(
         private bookService: BookService,

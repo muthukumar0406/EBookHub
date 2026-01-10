@@ -44,13 +44,10 @@ namespace EbookHub.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UploadBook([FromForm] IFormFile file, [FromForm] string title, [FromForm] string author)
+        public async Task<IActionResult> UploadBook([FromForm] IFormFile file, [FromForm] IFormFile? coverImage, [FromForm] string title, [FromForm] string author)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
-
-            if (Path.GetExtension(file.FileName).ToLower() != ".pdf")
-                return BadRequest("Only PDF files are allowed.");
 
             // Save file to disk
             var uploadsFolder = Path.Combine(_environment.ContentRootPath, "Uploads");
@@ -65,11 +62,23 @@ namespace EbookHub.API.Controllers
                 await file.CopyToAsync(stream);
             }
 
+            string? uniqueCoverName = null;
+            if (coverImage != null && coverImage.Length > 0)
+            {
+                uniqueCoverName = Guid.NewGuid().ToString() + "_" + coverImage.FileName;
+                var coverPath = Path.Combine(uploadsFolder, uniqueCoverName);
+                using (var stream = new FileStream(coverPath, FileMode.Create))
+                {
+                    await coverImage.CopyToAsync(stream);
+                }
+            }
+
             var book = new Book
             {
                 Title = title,
                 Author = author,
                 FileName = uniqueFileName,
+                CoverImageName = uniqueCoverName,
                 UploadDate = DateTime.UtcNow
             };
 
@@ -91,6 +100,15 @@ namespace EbookHub.API.Controllers
             if (System.IO.File.Exists(filePath))
             {
                 System.IO.File.Delete(filePath);
+            }
+
+            if (!string.IsNullOrEmpty(book.CoverImageName))
+            {
+                var coverPath = Path.Combine(_environment.ContentRootPath, "Uploads", book.CoverImageName);
+                if (System.IO.File.Exists(coverPath))
+                {
+                    System.IO.File.Delete(coverPath);
+                }
             }
 
             _context.Books.Remove(book);

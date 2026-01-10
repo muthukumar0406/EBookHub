@@ -1,4 +1,4 @@
-<div class="reader-container" *ngIf="pdfSrc">
+<div class="reader-container" *ngIf="pdfSrc || safeUrl">
     <div class="reader-header">
         <button routerLink="/library" class="back-btn">
             <span>←</span> Back to Library
@@ -6,8 +6,13 @@
         <h3>{{ book?.title }}</h3>
     </div>
 
-    <ngx-extended-pdf-viewer [src]="pdfSrc" height="90vh">
+    <!-- PDF Viewer -->
+    <ngx-extended-pdf-viewer *ngIf="fileType === 'pdf'" [src]="pdfSrc" height="90vh">
     </ngx-extended-pdf-viewer>
+
+    <!-- HTML or Other files in Iframe -->
+    <iframe *ngIf="fileType !== 'pdf'" [src]="safeUrl" width="100%" height="90vh" frameborder="0">
+    </iframe>
 </div>
 
 <div *ngIf="!pdfSrc && !errorMessage" class="loading">

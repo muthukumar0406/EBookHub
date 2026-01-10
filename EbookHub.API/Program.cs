@@ -150,6 +150,13 @@ using (var scope = app.Services.CreateScope())
         try 
         {
             dbContext.Database.EnsureCreated();
+            
+            // Hack to add column if it doesn't exist (since EnsureCreated won't update existing tables)
+            try {
+                dbContext.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Books]') AND name = 'CoverImageName') " +
+                                                "ALTER TABLE [dbo].[Books] ADD [CoverImageName] NVARCHAR(MAX) NULL;");
+            } catch { /* Ignore if it fails */ }
+
             logger.LogInformation("Database initialization successful.");
             break;
         }

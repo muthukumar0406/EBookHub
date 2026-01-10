@@ -15,6 +15,8 @@ namespace EbookHub.API.Models
         [Required]
         public string FileName { get; set; } = string.Empty;
 
+        public string? CoverImageName { get; set; }
+
         public DateTime UploadDate { get; set; } = DateTime.UtcNow;
     }
 }

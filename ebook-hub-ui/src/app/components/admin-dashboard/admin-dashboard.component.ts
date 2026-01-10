@@ -16,6 +16,7 @@ export class AdminDashboardComponent implements OnInit {
     title = '';
     author = '';
     selectedFile: File | null = null;
+    selectedCoverFile: File | null = null;
     message = '';
 
     constructor(private bookService: BookService, private authService: AuthService) { }
@@ -35,6 +36,10 @@ export class AdminDashboardComponent implements OnInit {
         this.selectedFile = event.target.files[0];
     }
 
+    onCoverSelected(event: any) {
+        this.selectedCoverFile = event.target.files[0];
+    }
+
     uploadBook() {
         if (!this.selectedFile || !this.title || !this.author) {
             this.message = 'Please fill all fields';
@@ -45,6 +50,9 @@ export class AdminDashboardComponent implements OnInit {
         formData.append('title', this.title);
         formData.append('author', this.author);
         formData.append('file', this.selectedFile);
+        if (this.selectedCoverFile) {
+            formData.append('coverImage', this.selectedCoverFile);
+        }
 
         this.bookService.uploadBook(formData).subscribe({
             next: () => {
@@ -53,6 +61,7 @@ export class AdminDashboardComponent implements OnInit {
                 this.title = '';
                 this.author = '';
                 this.selectedFile = null;
+                this.selectedCoverFile = null;
             },
             error: (err) => {
                 this.message = 'Upload failed';

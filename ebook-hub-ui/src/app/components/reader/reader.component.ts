@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer'; // Ensure this is installed
 import { BookService, Book } from '../../services/book.service';
@@ -16,9 +17,15 @@ export class ReaderComponent implements OnInit {
     bookId: number | null = null;
     book: Book | null = null;
     pdfSrc: string | undefined;
+    fileType: 'pdf' | 'html' | 'other' = 'pdf';
+    safeUrl: any;
     errorMessage: string | null = null;
 
-    constructor(private route: ActivatedRoute, private bookService: BookService) { }
+    constructor(
+        private route: ActivatedRoute,
+        private bookService: BookService,
+        private sanitizer: DomSanitizer
+    ) { }
 
     ngOnInit(): void {
         this.errorMessage = null;
@@ -33,18 +40,23 @@ export class ReaderComponent implements OnInit {
                     console.log('ReaderComponent: Book fetched successfully', book);
                     this.book = book;
                     if (this.book && this.book.fileName) {
-                        // Correctly pointing to the backend's static file serving endpoint
                         const baseUrl = environment.apiUrl.replace('/api', '');
-                        // Use encodeURIComponent just in case the filename has spaces or special chars
-                        const safeFileName = encodeURIComponent(this.book.fileName);
-                        this.pdfSrc = `${baseUrl}/uploads/${this.book.fileName}`; // Use raw fileName first as it includes the UID
+                        const fullUrl = `${baseUrl}/uploads/${this.book.fileName}`;
+                        const extension = this.book.fileName.split('.').pop()?.toLowerCase();
 
-                        // If it has spaces, the browser usually handles it but let's be safe
-                        if (this.book.fileName.includes(' ')) {
-                            this.pdfSrc = `${baseUrl}/uploads/${encodeURI(this.book.fileName)}`;
+                        if (extension === 'pdf') {
+                            this.fileType = 'pdf';
+                            this.pdfSrc = fullUrl;
+                        } else if (extension === 'html' || extension === 'htm') {
+                            this.fileType = 'html';
+                            this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fullUrl);
+                        } else {
+                            this.fileType = 'other';
+                            this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fullUrl);
                         }
 
-                        console.log('ReaderComponent: Setting pdfSrc to:', this.pdfSrc);
+                        console.log('ReaderComponent: File type determined as:', this.fileType);
+                        console.log('ReaderComponent: Setting URL to:', fullUrl);
                     } else {
                         this.errorMessage = 'Book not found in library';
                         console.error('ReaderComponent: Book found but has no fileName');
