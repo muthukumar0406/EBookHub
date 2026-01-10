@@ -26,14 +26,15 @@ export class UserLibraryComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        // Load immediately if we already have user info
-        if (this.authService.currentUserValue) {
-            this.loadBooks();
-        }
+        console.log('UserLibraryComponent: Initializing...');
 
-        // Also subscribe to ensure it loads after a fresh login
+        // Initial load attempt
+        this.loadBooks();
+
+        // Ensure we catch state changes (like right after login)
         this.authService.currentUser$.subscribe(user => {
-            if (user && this.books.length === 0) {
+            if (user) {
+                console.log('UserLibraryComponent: User state detected, loading books...');
                 this.loadBooks();
             }
         });
@@ -42,6 +43,7 @@ export class UserLibraryComponent implements OnInit {
     loadBooks() {
         this.bookService.getBooks().subscribe({
             next: (data) => {
+                console.log('UserLibraryComponent: Books loaded successfully', data.length);
                 this.books = data;
                 this.filteredBooks = data;
             },
