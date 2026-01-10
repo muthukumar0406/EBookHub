@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { BookService, Book } from '../../services/book.service';
 import { environment } from '../../../environments/environment';
-import { timeout } from 'rxjs';
 
 @Component({
     selector: 'app-reader',
@@ -21,11 +20,13 @@ export class ReaderComponent implements OnInit {
     fileType: 'pdf' | 'html' | 'other' = 'pdf';
     safeUrl: any;
     errorMessage: string | null = null;
+    fetchStarted = false;
 
     constructor(
         private route: ActivatedRoute,
         private bookService: BookService,
-        private sanitizer: DomSanitizer
+        private sanitizer: DomSanitizer,
+        private cdr: ChangeDetectorRef
     ) { }
 
     ngOnInit(): void {
@@ -39,61 +40,61 @@ export class ReaderComponent implements OnInit {
             } else {
                 this.errorMessage = 'No book ID provided in the URL.';
             }
+            this.cdr.detectChanges();
         });
     }
 
     loadBook(id: number) {
-        console.log('ReaderComponent: Fetching details for book ID:', id);
+        console.log('ReaderComponent: Initiating fetch for book ID:', id);
+        this.fetchStarted = true;
         this.errorMessage = null;
         this.pdfSrc = undefined;
         this.safeUrl = null;
+        this.book = null;
 
-        this.bookService.getBook(id).pipe(timeout(10000)).subscribe({
+        // Using a plain subscription without timeout operator first to simplify debugging
+        this.bookService.getBook(id).subscribe({
             next: (book) => {
-                console.log('ReaderComponent: Received book data:', book);
+                console.log('ReaderComponent: METADATA LOADED SUCCESS', book);
                 this.book = book;
 
                 if (!book || !book.fileName) {
-                    this.errorMessage = 'Invalid book data received: FileName is missing.';
-                    console.error('ReaderComponent: Book data is invalid', book);
-                    return;
-                }
-
-                const baseUrl = environment.apiUrl.replace('/api', '');
-                const fullUrl = `${baseUrl}/uploads/${book.fileName}`;
-                const encodedUrl = encodeURI(fullUrl);
-                const extension = book.fileName.split('.').pop()?.toLowerCase();
-
-                console.log('ReaderComponent: Constructed URL:', encodedUrl);
-                console.log('ReaderComponent: File extension:', extension);
-
-                if (extension === 'pdf') {
-                    this.fileType = 'pdf';
-                    this.pdfSrc = encodedUrl;
-                } else if (extension === 'html' || extension === 'htm') {
-                    this.fileType = 'html';
-                    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(encodedUrl);
+                    this.errorMessage = 'Invalid book data received from server.';
+                    console.error('ReaderComponent: Missing FileName in response');
                 } else {
-                    this.fileType = 'other';
-                    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(encodedUrl);
-                }
+                    const baseUrl = environment.apiUrl.replace('/api', '');
+                    const fullUrl = `${baseUrl}/uploads/${book.fileName}`;
+                    const encodedUrl = encodeURI(fullUrl);
+                    const extension = book.fileName.split('.').pop()?.toLowerCase();
 
-                console.log('ReaderComponent: fileType set to:', this.fileType);
+                    if (extension === 'pdf') {
+                        this.fileType = 'pdf';
+                        this.pdfSrc = encodedUrl;
+                    } else if (extension === 'html' || extension === 'htm') {
+                        this.fileType = 'html';
+                        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(encodedUrl);
+                    } else {
+                        this.fileType = 'other';
+                        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(encodedUrl);
+                    }
+                    console.log('ReaderComponent: READY to show content of type:', this.fileType);
+                }
+                this.cdr.detectChanges();
             },
             error: (err) => {
-                console.error('ReaderComponent: Error fetching book:', err);
-                if (err.name === 'TimeoutError') {
-                    this.errorMessage = 'The request timed out (10s). The server might be slow or unreachable.';
-                } else if (err.status === 404) {
-                    this.errorMessage = 'Book not found on the server (404).';
-                } else if (err.status === 401) {
-                    this.errorMessage = 'You are not authorized (401). Please login again.';
-                } else if (err.status === 0) {
-                    this.errorMessage = 'Cannot reach the server. Please check if the backend API is running on ' + environment.apiUrl;
-                } else {
-                    this.errorMessage = 'Request failed: ' + (err.statusText || err.message || 'Unknown Error');
-                }
+                console.error('ReaderComponent: FETCH ERROR', err);
+                this.errorMessage = `Failed to load book metadata (Status: ${err.status}). ` + (err.error || err.message || '');
+                this.cdr.detectChanges();
             }
         });
+
+        // Forced fallback if request stays pending too long
+        setTimeout(() => {
+            if (!this.book && !this.errorMessage) {
+                console.warn('ReaderComponent: Request still pending after 8 seconds - check network tab');
+                this.errorMessage = 'The server is taking too long to respond. Please ensure the backend is running and reachable.';
+                this.cdr.detectChanges();
+            }
+        }, 8000);
     }
 }

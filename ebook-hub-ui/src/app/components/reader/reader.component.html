@@ -24,9 +24,10 @@
     <div class="debug-monitor"
         style="margin-top: 2rem; font-family: monospace; font-size: 0.75rem; color: #666; background: rgba(0,0,0,0.05); padding: 1rem; border-radius: 8px;">
         Status Monitor:<br>
-        - Book Fetched: {{ book ? 'Yes' : 'No' }}<br>
-        - File Type: {{ fileType }}<br>
-        - URL Ready: {{ (pdfSrc || safeUrl) ? 'Yes' : 'No' }}
+        - Fetch Initiated: {{ fetchStarted ? 'Yes' : 'No' }}<br>
+        - Metadata Arrived: {{ book ? 'Yes' : 'No' }}<br>
+        - Content Type: {{ fileType }}<br>
+        - URL Available: {{ (pdfSrc || safeUrl) ? 'Yes' : 'No' }}
     </div>
 </div>
 

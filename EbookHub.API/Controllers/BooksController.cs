@@ -34,12 +34,19 @@ namespace EbookHub.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
+        [AllowAnonymous] // Temporarily allow anonymous for debugging
         public async Task<ActionResult<Book>> GetBook(int id)
         {
-            var book = await _context.Books.FindAsync(id);
-            if (book == null) return NotFound();
-            return book;
+            try
+            {
+                var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
+                if (book == null) return NotFound();
+                return book;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpPost]
