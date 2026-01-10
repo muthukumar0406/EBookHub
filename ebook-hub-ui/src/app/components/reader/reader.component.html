@@ -1,4 +1,4 @@
-<div class="reader-container" *ngIf="pdfSrc || safeUrl">
+<div class="reader-container" *ngIf="safeUrl">
     <div class="reader-header">
         <div class="header-left">
             <button [routerLink]="['/library']" class="back-btn">
@@ -10,27 +10,21 @@
             <h3>{{ book?.title }}</h3>
         </div>
         <div class="header-right">
-            <!-- Space for future actions like zoom or bookmarks -->
-            <span class="file-badge">{{ fileType | uppercase }}</span>
+            <span class="file-badge">{{ fileType }}</span>
         </div>
     </div>
 
     <div class="viewer-wrapper">
-        <!-- PDF Viewer -->
-        <ngx-extended-pdf-viewer *ngIf="fileType === 'pdf' && pdfSrc" [src]="pdfSrc" height="88vh">
-        </ngx-extended-pdf-viewer>
-
-        <!-- HTML or Other files in Iframe -->
-        <div class="iframe-container" *ngIf="fileType !== 'pdf' && safeUrl">
-            <iframe [src]="safeUrl" width="100%" height="100%" frameborder="0">
+        <div class="iframe-container">
+            <iframe [src]="safeUrl" width="100%" height="100%" frameborder="0" allowfullscreen>
             </iframe>
         </div>
     </div>
 </div>
 
-<div *ngIf="!pdfSrc && !safeUrl && !errorMessage" class="loading-state">
+<div *ngIf="isLoading && !errorMessage" class="loading-state">
     <div class="spinner"></div>
-    <h3>Opening E-Book</h3>
+    <h3>Opening Book</h3>
     <p>Please wait while we prepare your reader...</p>
 </div>
 
