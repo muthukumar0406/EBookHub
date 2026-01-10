@@ -1,30 +1,44 @@
 <div class="reader-container" *ngIf="pdfSrc || safeUrl">
     <div class="reader-header">
-        <button routerLink="/library" class="back-btn">
+        <button [routerLink]="['/library']" class="back-btn">
             <span>←</span> Back to Library
         </button>
-        <h3>{{ book?.title }}</h3>
+        <h3>{{ book?.title || 'E-Book' }}</h3>
     </div>
 
-    <!-- PDF Viewer -->
-    <ngx-extended-pdf-viewer *ngIf="fileType === 'pdf'" [src]="pdfSrc" height="90vh">
-    </ngx-extended-pdf-viewer>
+    <div class="viewer-wrapper">
+        <!-- PDF Viewer -->
+        <ngx-extended-pdf-viewer *ngIf="fileType === 'pdf' && pdfSrc" [src]="pdfSrc" height="90vh"
+            [useBrowserVisible]="true">
+        </ngx-extended-pdf-viewer>
 
-    <!-- HTML or Other files in Iframe -->
-    <iframe *ngIf="fileType !== 'pdf'" [src]="safeUrl" width="100%" height="90vh" frameborder="0">
-    </iframe>
+        <!-- HTML or Other files in Iframe -->
+        <iframe *ngIf="fileType !== 'pdf' && safeUrl" [src]="safeUrl" width="100%" height="90vh" frameborder="0">
+        </iframe>
+    </div>
 </div>
 
-<div *ngIf="!pdfSrc && !safeUrl && !errorMessage" class="loading">
-    <div class="loading-spinner"></div>
-    <p>Loading book...</p>
-    <p class="debug-hint" style="font-size: 0.8rem; opacity: 0.6; margin-top: 2rem;">
-        Trying to fetch book ID: {{ bookId }}
-    </p>
+<div *ngIf="!pdfSrc && !safeUrl && !errorMessage" class="loading-state">
+    <div class="spinner"></div>
+    <h3>Opening "{{ book?.title || 'your book' }}"...</h3>
+    <p>Loading metadata for book ID: {{ bookId }}</p>
+    <div class="debug-monitor"
+        style="margin-top: 2rem; font-family: monospace; font-size: 0.75rem; color: #666; background: rgba(0,0,0,0.05); padding: 1rem; border-radius: 8px;">
+        Status Monitor:<br>
+        - Book Fetched: {{ book ? 'Yes' : 'No' }}<br>
+        - File Type: {{ fileType }}<br>
+        - URL Ready: {{ (pdfSrc || safeUrl) ? 'Yes' : 'No' }}
+    </div>
 </div>
 
-<div *ngIf="errorMessage" class="error-container">
-    <p>⚠️ {{ errorMessage }}</p>
-    <button (click)="ngOnInit()" class="btn-primary">Retry</button>
-    <button routerLink="/library" class="btn-secondary">Back to Library</button>
+<div *ngIf="errorMessage" class="error-state">
+    <div class="error-card glass">
+        <span class="error-icon">⚠️</span>
+        <h2>Oops! Something went wrong</h2>
+        <p>{{ errorMessage }}</p>
+        <div class="error-actions">
+            <button (click)="ngOnInit()" class="btn-primary">Retry</button>
+            <button [routerLink]="['/library']" class="btn-secondary">Go to Library</button>
+        </div>
+    </div>
 </div>
