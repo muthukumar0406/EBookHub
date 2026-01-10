@@ -30,6 +30,7 @@ export class ReaderComponent implements OnInit {
     ngOnInit(): void {
         this.errorMessage = null;
         this.pdfSrc = undefined;
+        this.safeUrl = null;
         const idParam = this.route.snapshot.paramMap.get('id');
         console.log('ReaderComponent: idParam =', idParam);
         this.bookId = idParam ? Number(idParam) : null;
@@ -41,7 +42,8 @@ export class ReaderComponent implements OnInit {
                     this.book = book;
                     if (this.book && this.book.fileName) {
                         const baseUrl = environment.apiUrl.replace('/api', '');
-                        const fullUrl = `${baseUrl}/uploads/${this.book.fileName}`;
+                        // Use encodeURI to handle spaces but keep slashes and colons safe
+                        const fullUrl = encodeURI(`${baseUrl}/uploads/${this.book.fileName}`);
                         const extension = this.book.fileName.split('.').pop()?.toLowerCase();
 
                         if (extension === 'pdf') {
