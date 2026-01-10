@@ -1,44 +1,47 @@
 <div class="reader-container" *ngIf="pdfSrc || safeUrl">
     <div class="reader-header">
-        <button [routerLink]="['/library']" class="back-btn">
-            <span>←</span> Back to Library
-        </button>
-        <h3>{{ book?.title || 'E-Book' }}</h3>
+        <div class="header-left">
+            <button [routerLink]="['/library']" class="back-btn">
+                <span class="icon">←</span>
+                <span>Library</span>
+            </button>
+        </div>
+        <div class="header-center">
+            <h3>{{ book?.title }}</h3>
+        </div>
+        <div class="header-right">
+            <!-- Space for future actions like zoom or bookmarks -->
+            <span class="file-badge">{{ fileType | uppercase }}</span>
+        </div>
     </div>
 
     <div class="viewer-wrapper">
         <!-- PDF Viewer -->
-        <ngx-extended-pdf-viewer *ngIf="fileType === 'pdf' && pdfSrc" [src]="pdfSrc" height="90vh">
+        <ngx-extended-pdf-viewer *ngIf="fileType === 'pdf' && pdfSrc" [src]="pdfSrc" height="100%">
         </ngx-extended-pdf-viewer>
 
         <!-- HTML or Other files in Iframe -->
-        <iframe *ngIf="fileType !== 'pdf' && safeUrl" [src]="safeUrl" width="100%" height="90vh" frameborder="0">
-        </iframe>
+        <div class="iframe-container" *ngIf="fileType !== 'pdf' && safeUrl">
+            <iframe [src]="safeUrl" width="100%" height="100%" frameborder="0">
+            </iframe>
+        </div>
     </div>
 </div>
 
 <div *ngIf="!pdfSrc && !safeUrl && !errorMessage" class="loading-state">
     <div class="spinner"></div>
-    <h3>Opening "{{ book?.title || 'your book' }}"...</h3>
-    <p>Loading metadata for book ID: {{ bookId }}</p>
-    <div class="debug-monitor"
-        style="margin-top: 2rem; font-family: monospace; font-size: 0.75rem; color: #666; background: rgba(0,0,0,0.05); padding: 1rem; border-radius: 8px;">
-        Status Monitor:<br>
-        - Fetch Initiated: {{ fetchStarted ? 'Yes' : 'No' }}<br>
-        - Metadata Arrived: {{ book ? 'Yes' : 'No' }}<br>
-        - Content Type: {{ fileType }}<br>
-        - URL Available: {{ (pdfSrc || safeUrl) ? 'Yes' : 'No' }}
-    </div>
+    <h3>Opening E-Book</h3>
+    <p>Please wait while we prepare your reader...</p>
 </div>
 
 <div *ngIf="errorMessage" class="error-state">
     <div class="error-card glass">
         <span class="error-icon">⚠️</span>
-        <h2>Oops! Something went wrong</h2>
+        <h2>Reader Error</h2>
         <p>{{ errorMessage }}</p>
         <div class="error-actions">
-            <button (click)="ngOnInit()" class="btn-primary">Retry</button>
-            <button [routerLink]="['/library']" class="btn-secondary">Go to Library</button>
+            <button (click)="ngOnInit()" class="btn-primary">Try Again</button>
+            <button [routerLink]="['/library']" class="btn-secondary">Back to Library</button>
         </div>
     </div>
 </div>
