@@ -104,6 +104,36 @@
     }
 }
 
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .reader-header {
+        padding: 0.5rem 1rem;
+    }
+
+    .header-center h3 {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+        margin: 0 auto;
+    }
+
+    .back-btn span:last-child {
+        display: none;
+        /* Hide 'Library' text on small screens */
+    }
+
+    .back-btn {
+        padding: 0.5rem;
+    }
+
+    .iframe-container {
+        max-width: 100%;
+        box-shadow: none;
+    }
+}
+
 .loading-state,
 .error-state {
     display: flex;
