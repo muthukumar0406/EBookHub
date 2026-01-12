@@ -75,6 +75,55 @@
     border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
+.zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.25rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.zoom-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: #f1f5f9;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.zoom-btn:hover {
+    background: rgba(99, 102, 241, 0.3);
+    color: white;
+}
+
+.zoom-label {
+    min-width: 45px;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #94a3b8;
+}
+
+@media (max-width: 500px) {
+    .zoom-label {
+        display: none;
+    }
+
+    .zoom-controls {
+        margin-right: 0.5rem;
+    }
+}
+
 .viewer-wrapper {
     flex: 1;
     background: #0f172a;

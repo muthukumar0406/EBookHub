@@ -10,6 +10,11 @@
             <h3>{{ book?.title }}</h3>
         </div>
         <div class="header-right">
+            <div class="zoom-controls">
+                <button (click)="zoomOut()" class="zoom-btn" title="Zoom Out">A-</button>
+                <span class="zoom-label">{{ (zoomLevel * 100) | number:'1.0-0' }}%</span>
+                <button (click)="zoomIn()" class="zoom-btn" title="Zoom In">A+</button>
+            </div>
             <span class="file-badge">{{ fileType }}</span>
         </div>
     </div>
