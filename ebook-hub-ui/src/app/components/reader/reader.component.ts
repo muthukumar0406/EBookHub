@@ -55,6 +55,7 @@ export class ReaderComponent implements OnInit {
         if (this.zoomLevel < 3.0) {
             this.zoomLevel += 0.1;
             this.applyZoom();
+            setTimeout(() => this.applyZoom(), 50); // Double call to catch async dynamic content
         }
     }
 
@@ -62,6 +63,7 @@ export class ReaderComponent implements OnInit {
         if (this.zoomLevel > 0.5) {
             this.zoomLevel -= 0.1;
             this.applyZoom();
+            setTimeout(() => this.applyZoom(), 50);
         }
     }
 

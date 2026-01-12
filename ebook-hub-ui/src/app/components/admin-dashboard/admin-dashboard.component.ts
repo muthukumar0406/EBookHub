@@ -22,6 +22,12 @@ export class AdminDashboardComponent implements OnInit {
     constructor(private bookService: BookService, private authService: AuthService) { }
 
     ngOnInit(): void {
+        const user = this.authService.currentUserValue;
+        if (!user || user.role !== 'Admin') {
+            this.message = 'Access Denied. Please login as Admin.';
+            setTimeout(() => this.authService.logout().subscribe(), 2000);
+            return;
+        }
         this.loadBooks();
     }
 

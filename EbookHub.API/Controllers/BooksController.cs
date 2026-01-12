@@ -52,6 +52,7 @@ namespace EbookHub.API.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [DisableRequestSizeLimit]
+        [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue, ValueLengthLimit = int.MaxValue)]
         public async Task<IActionResult> UploadBook([FromForm] IFormFile file, [FromForm] IFormFile? coverImage, [FromForm] string title, [FromForm] string author)
         {
             if (file == null || file.Length == 0)
