@@ -64,8 +64,8 @@ export class AdminDashboardComponent implements OnInit {
                 this.selectedCoverFile = null;
             },
             error: (err) => {
-                this.message = 'Upload failed';
-                console.error(err);
+                this.message = `Upload failed: ${err.statusText || 'Unknown error'}. Please check if the file is too large or the server is reachable.`;
+                console.error('Upload Error:', err);
             }
         });
     }

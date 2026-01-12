@@ -15,13 +15,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<FormOptions>(options =>
 {
     options.ValueLengthLimit = int.MaxValue;
-    options.MultipartBodyLengthLimit = 1024 * 1024 * 1024; // 1GB
+    options.MultipartBodyLengthLimit = 2097152000; // 2GB
     options.MemoryBufferThreshold = int.MaxValue;
+});
+
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = 2097152000; // 2GB
 });
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.Limits.MaxRequestBodySize = 1024 * 1024 * 1024; // 1GB
+    serverOptions.Limits.MaxRequestBodySize = 2097152000; // 2GB
 });
 
 builder.Services.AddControllers();

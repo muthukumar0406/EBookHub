@@ -25,6 +25,15 @@
                 (load)="onIframeLoad($event)">
             </iframe>
         </div>
+
+        <div class="reader-footer" *ngIf="isHtml && totalPages > 0">
+            <div class="page-indicator">
+                Page <span>{{ currentPage }}</span> of <span>{{ totalPages }}</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="(currentPage / totalPages) * 100"></div>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -47,16 +47,17 @@ RUN echo 'server { \
         proxy_set_header Connection "upgrade"; \
         proxy_set_header Host $host; \
         proxy_cache_bypass $http_upgrade; \
-        proxy_read_timeout 300s; \
-        proxy_connect_timeout 300s; \
-        proxy_send_timeout 300s; \
+        proxy_read_timeout 600s; \
+        proxy_connect_timeout 600s; \
+        proxy_send_timeout 600s; \
+        client_body_timeout 600s; \
     } \
     location /uploads/ { \
         proxy_pass http://api:8080/uploads/; \
         proxy_http_version 1.1; \
         proxy_set_header Host $host; \
         proxy_cache_bypass $http_upgrade; \
-        proxy_read_timeout 300s; \
+        proxy_read_timeout 600s; \
     } \
 }' > /etc/nginx/conf.d/default.conf
 

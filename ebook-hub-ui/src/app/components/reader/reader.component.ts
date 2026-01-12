@@ -20,13 +20,25 @@ export class ReaderComponent implements OnInit {
     errorMessage: string | null = null;
     isLoading: boolean = true;
     zoomLevel: number = 1.0;
+    currentPage: number = 1;
+    totalPages: number = 0;
+    isHtml: boolean = false;
 
     constructor(
         private route: ActivatedRoute,
         private bookService: BookService,
         private sanitizer: DomSanitizer,
         private cdr: ChangeDetectorRef
-    ) { }
+    ) {
+        // Listen for scroll messages from the iframe
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'pageUpdate') {
+                this.currentPage = event.data.currentPage;
+                this.totalPages = event.data.totalPages;
+                this.cdr.detectChanges();
+            }
+        });
+    }
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
@@ -60,7 +72,12 @@ export class ReaderComponent implements OnInit {
                 const doc = iframe.contentDocument || iframe.contentWindow?.document;
                 if (doc) {
                     const body = doc.body;
-                    body.style.fontSize = `${100 * this.zoomLevel}%`;
+                    body.style.setProperty('font-size', `${100 * this.zoomLevel}%`, 'important');
+                    // Also force children if they have hardcoded font sizes
+                    const allElements = doc.querySelectorAll('p, div, span, h1, h2, h3, h4, h5, h6');
+                    allElements.forEach((el: any) => {
+                        el.style.setProperty('font-size', 'inherit', 'important');
+                    });
                 }
             } catch (e) {
                 console.warn('Could not apply zoom to iframe body:', e);
@@ -106,10 +123,10 @@ export class ReaderComponent implements OnInit {
         const iframe = event.target as HTMLIFrameElement;
         if (!iframe || !this.book) return;
 
-        const isHtml = this.book.fileName.toLowerCase().endsWith('.html') ||
+        this.isHtml = this.book.fileName.toLowerCase().endsWith('.html') ||
             this.book.fileName.toLowerCase().endsWith('.htm');
 
-        if (isHtml) {
+        if (this.isHtml) {
             try {
                 const doc = iframe.contentDocument || iframe.contentWindow?.document;
                 if (doc) {
@@ -145,7 +162,6 @@ export class ReaderComponent implements OnInit {
                             height: auto !important;
                             -webkit-text-size-adjust: 100% !important;
                             background-color: #ffffff !important;
-                            overflow-x: hidden !important;
                         }
 
                         body {
@@ -153,7 +169,7 @@ export class ReaderComponent implements OnInit {
                             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
                             line-height: 1.6 !important;
                             color: #1a1a1a !important;
-                            font-size: 100% !important; /* Managed by zoomLevel */
+                            font-size: 100% !important; 
                             display: flex !important;
                             flex-direction: column !important;
                             align-items: stretch !important;
@@ -166,16 +182,14 @@ export class ReaderComponent implements OnInit {
                             margin-bottom: 1rem !important;
                             color: #000 !important;
                             display: block !important;
+                            font-size: clamp(1.2rem, 5vw, 2.5rem) !important;
                         }
-
-                        h1 { font-size: 1.8rem !important; }
-                        h2 { font-size: 1.5rem !important; }
-                        h3 { font-size: 1.25rem !important; }
 
                         p, div, span {
                             width: 100% !important;
                             display: block !important;
                             margin-bottom: 0.75rem !important;
+                            font-size: inherit !important; 
                         }
 
                         img, svg, canvas {
@@ -184,27 +198,39 @@ export class ReaderComponent implements OnInit {
                             max-width: 100% !important;
                             height: auto !important;
                         }
-
-                        table {
-                            width: 100% !important;
-                            display: block !important;
-                            overflow-x: auto !important;
-                            margin: 1.5rem 0 !important;
-                        }
-
-                        pre, code {
-                            white-space: pre-wrap !important;
-                            word-break: break-all !important;
-                            background: #f4f4f4 !important;
-                            padding: 0.5rem !important;
-                            border-radius: 4px !important;
-                        }
                     `;
                     doc.head.appendChild(style);
+
+                    // Inject pagination/scroll reporting script
+                    const script = doc.createElement('script');
+                    script.textContent = `
+                        function reportPages() {
+                            const scrollHeight = document.documentElement.scrollHeight;
+                            const clientHeight = document.documentElement.clientHeight;
+                            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                            
+                            const totalPages = Math.max(1, Math.ceil(scrollHeight / clientHeight));
+                            const currentPage = Math.max(1, Math.min(totalPages, Math.floor(scrollTop / clientHeight) + 1));
+                            
+                            window.parent.postMessage({
+                                type: 'pageUpdate',
+                                currentPage: currentPage,
+                                totalPages: totalPages
+                            }, '*');
+                        }
+
+                        window.addEventListener('scroll', reportPages);
+                        window.addEventListener('resize', reportPages);
+                        setTimeout(reportPages, 500);
+                        const observer = new ResizeObserver(reportPages);
+                        observer.observe(document.body);
+                    `;
+                    doc.body.appendChild(script);
+
                     this.applyZoom();
                 }
             } catch (e) {
-                console.warn('Could not inject styles into iframe (check CORS):', e);
+                console.warn('Could not inject into iframe:', e);
             }
         }
     }

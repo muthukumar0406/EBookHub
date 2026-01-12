@@ -128,13 +128,13 @@
     flex: 1;
     background: #0f172a;
     position: relative;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .iframe-container {
-    height: 100%;
+    flex: 1;
     width: 100%;
     max-width: 1000px;
     margin: 0 auto;
@@ -142,6 +142,45 @@
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
     animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
+}
+
+.reader-footer {
+    height: 60px;
+    background: #1e293b;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+    z-index: 20;
+}
+
+.page-indicator {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.page-indicator span {
+    color: #f1f5f9;
+    font-weight: 600;
+}
+
+.progress-bar {
+    width: 100%;
+    max-width: 400px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #818cf8);
+    transition: width 0.3s ease;
 }
 
 @keyframes slideUp {
