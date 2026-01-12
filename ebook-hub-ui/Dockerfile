@@ -33,6 +33,7 @@ RUN if [ -d "/tmp/dist/ebook-hub-ui/browser" ]; then \
 RUN echo 'server { \
     listen 80; \
     server_name localhost; \
+    client_max_body_size 1024M; \
     root /usr/share/nginx/html; \
     index index.html index.htm; \
     add_header Cross-Origin-Opener-Policy same-origin-allow-popups; \
@@ -46,12 +47,16 @@ RUN echo 'server { \
         proxy_set_header Connection "upgrade"; \
         proxy_set_header Host $host; \
         proxy_cache_bypass $http_upgrade; \
+        proxy_read_timeout 300s; \
+        proxy_connect_timeout 300s; \
+        proxy_send_timeout 300s; \
     } \
     location /uploads/ { \
         proxy_pass http://api:8080/uploads/; \
         proxy_http_version 1.1; \
         proxy_set_header Host $host; \
         proxy_cache_bypass $http_upgrade; \
+        proxy_read_timeout 300s; \
     } \
 }' > /etc/nginx/conf.d/default.conf
 

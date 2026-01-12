@@ -1,5 +1,6 @@
 using EbookHub.API.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +10,19 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+// Increase file upload size limits
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.ValueLengthLimit = int.MaxValue;
+    options.MultipartBodyLengthLimit = 1024 * 1024 * 1024; // 1GB
+    options.MemoryBufferThreshold = int.MaxValue;
+});
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Limits.MaxRequestBodySize = 1024 * 1024 * 1024; // 1GB
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
