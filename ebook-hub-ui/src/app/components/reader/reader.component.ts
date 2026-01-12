@@ -94,44 +94,69 @@ export class ReaderComponent implements OnInit {
                     // Inject responsive styles
                     const style = doc.createElement('style');
                     style.textContent = `
+                        * {
+                            max-width: 100% !important;
+                            box-sizing: border-box !important;
+                            overflow-wrap: break-word !important;
+                        }
                         html, body {
-                            margin: 0;
-                            padding: 0;
-                            width: 100%;
-                            height: auto;
-                            -webkit-text-size-adjust: 100%;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            width: 100% !important;
+                            height: auto !important;
+                            -webkit-text-size-adjust: 100% !important;
+                            background-color: #ffffff !important;
                         }
                         body {
-                            max-width: 100vw;
-                            overflow-x: hidden;
-                            word-wrap: break-word;
-                            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                            line-height: 1.6;
-                            padding: 1.5rem;
-                            box-sizing: border-box;
-                            color: #1a1a1a;
-                            background-color: #fafafa;
-                            font-size: 16px;
+                            padding: 1.25rem !important;
+                            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+                            line-height: 1.6 !important;
+                            color: #111827 !important;
+                            font-size: 16px !important;
+                            display: block !important;
+                        }
+                        h1, h2, h3, h4, h5, h6 {
+                            width: 100% !important;
+                            line-height: 1.2 !important;
+                            margin-top: 1.5rem !important;
+                            margin-bottom: 1rem !important;
+                            word-wrap: break-word !important;
+                        }
+                        h1 { font-size: 1.75rem !important; }
+                        h2 { font-size: 1.5rem !important; }
+                        h3 { font-size: 1.25rem !important; }
+
+                        p {
+                            margin-bottom: 1rem !important;
+                            width: 100% !important;
                         }
                         img, video, canvas, svg {
+                            display: block !important;
+                            margin: 1rem auto !important;
                             max-width: 100% !important;
                             height: auto !important;
                         }
                         table {
                             width: 100% !important;
-                            display: block;
-                            overflow-x: auto;
-                            border-collapse: collapse;
-                        }
-                        iframe {
-                            max-width: 100% !important;
+                            display: block !important;
+                            overflow-x: auto !important;
+                            border-collapse: collapse !important;
+                            margin: 1rem 0 !important;
                         }
                         pre, code {
-                            white-space: pre-wrap;
-                            word-break: break-all;
-                            background: #eee;
-                            padding: 2px 4px;
-                            border-radius: 4px;
+                            white-space: pre-wrap !important;
+                            word-break: break-all !important;
+                            background: #f3f4f6 !important;
+                            padding: 0.5rem !important;
+                            border-radius: 6px !important;
+                            font-size: 0.9rem !important;
+                        }
+                        /* Remove any absolute positioning or fixed widths that might break layout */
+                        div, section, article {
+                            width: auto !important;
+                            height: auto !important;
+                            position: static !important;
+                            float: none !important;
                         }
                     `;
                     doc.head.appendChild(style);
