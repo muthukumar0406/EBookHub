@@ -30,6 +30,7 @@ export class AuthService {
             this.currentUserSubject.next({ token, role });
         }
     }
+  
 
     // Restore currentUserValue for backward compatibility (used by BookService and App)
     get currentUserValue(): { token: string; role: string } | null {
