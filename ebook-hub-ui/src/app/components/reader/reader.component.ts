@@ -266,6 +266,9 @@ export class ReaderComponent implements OnInit {
                 console.warn('Could not inject into iframe:', e);
             }
         }
+
+        // Initialize canvas for both HTML and PDF to allow reading sketches
+        setTimeout(() => this.initCanvas(), 1000);
     }
 
     loadReadingProgress() {
@@ -360,17 +363,36 @@ export class ReaderComponent implements OnInit {
     }
 
     private initCanvas() {
+        if (!this.canvasRef) return;
         const canvas = this.canvasRef.nativeElement;
+        const container = canvas.parentElement;
+        if (!container) return;
+
         this.ctx = canvas.getContext('2d')!;
 
-        // Match canvas size to container
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
+        // Match canvas size to container precisely
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
 
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
 
         this.loadSketches();
+
+        // Handle resizing/orientation change
+        const resizeObserver = new ResizeObserver(() => {
+            const oldData = canvas.toDataURL();
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+            this.ctx.lineCap = 'round';
+            this.ctx.lineJoin = 'round';
+
+            // Restore drawing after resize
+            const img = new Image();
+            img.onload = () => this.ctx.drawImage(img, 0, 0);
+            img.src = oldData;
+        });
+        resizeObserver.observe(container);
     }
 
     startDrawing(event: MouseEvent) {
@@ -391,9 +413,10 @@ export class ReaderComponent implements OnInit {
             this.ctx.globalCompositeOperation = 'destination-out';
             this.ctx.lineWidth = 30;
         } else if (this.currentTool === 'highlighter') {
-            this.ctx.globalCompositeOperation = 'source-over';
+            // Multiply blend mode makes highlighter look like it's behind the text
+            this.ctx.globalCompositeOperation = 'multiply';
             this.ctx.lineWidth = 25;
-            this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.4)'; // Semi-transparent yellow
+            this.ctx.strokeStyle = '#ffff00'; // Pure yellow (multiply handles transparency feel)
         } else {
             this.ctx.globalCompositeOperation = 'source-over';
             this.ctx.lineWidth = 3;
@@ -425,9 +448,9 @@ export class ReaderComponent implements OnInit {
                 this.ctx.globalCompositeOperation = 'destination-out';
                 this.ctx.lineWidth = 30;
             } else if (this.currentTool === 'highlighter') {
-                this.ctx.globalCompositeOperation = 'source-over';
+                this.ctx.globalCompositeOperation = 'multiply';
                 this.ctx.lineWidth = 25;
-                this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.4)';
+                this.ctx.strokeStyle = '#ffff00';
             } else {
                 this.ctx.globalCompositeOperation = 'source-over';
                 this.ctx.lineWidth = 3;
