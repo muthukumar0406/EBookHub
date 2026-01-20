@@ -25,7 +25,6 @@ export class ReaderComponent implements OnInit {
     isHtml: boolean = false;
     lastSavedPage: number = 0;
     showResumePrompt: boolean = false;
-    showResumePrompt: boolean = false;
     isSketchMode: boolean = false;
     currentTool: 'pen' | 'highlighter' | 'eraser' = 'pen';
     @ViewChild('sketchCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
