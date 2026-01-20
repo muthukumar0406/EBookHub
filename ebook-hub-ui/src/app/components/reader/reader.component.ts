@@ -129,6 +129,14 @@ export class ReaderComponent implements OnInit {
                 // Load reading progress
                 this.loadReadingProgress();
 
+                // If it's a PDF, we might want to initialize some basics
+                if (extension === 'pdf') {
+                    this.isHtml = false;
+                    this.currentPage = 1;
+                    this.totalPages = 0; // Unknown for direct iframe PDF
+                    this.loadSketches(); // Load for initial page
+                }
+
                 this.cdr.detectChanges();
             },
             error: (err) => {
@@ -298,6 +306,7 @@ export class ReaderComponent implements OnInit {
     }
 
     scrollToPage(page: number) {
+        if (!this.book) return;
         this.currentPage = page;
         const iframe = document.querySelector('iframe');
 
@@ -424,7 +433,16 @@ export class ReaderComponent implements OnInit {
     }
 
     loadSketches() {
-        if (!this.bookId || !this.isSketchMode) return;
+        if (!this.bookId) return;
+
+        // We want to load sketches even if not in sketch mode yet, 
+        // to show them if the user enters sketch mode on this page.
+        // Actually, we should probably only clear and draw if context exists.
+        if (!this.ctx) {
+            // If ctx doesn't exist yet (sketch mode off), we just wait.
+            return;
+        }
+
         this.clearCanvas();
         this.bookService.getSketches(this.bookId, this.currentPage).subscribe({
             next: (sketches) => {

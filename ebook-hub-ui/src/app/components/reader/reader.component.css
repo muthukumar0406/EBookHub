@@ -616,6 +616,56 @@
     color: #f1f5f9;
 }
 
+/* PDF Page Controls */
+.pdf-controls {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.pdf-controls .page-nav {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.pdf-controls .page-nav:hover:not(:disabled) {
+    background: #6366f1;
+}
+
+.pdf-controls .page-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.pdf-controls .page-num {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #f1f5f9;
+    min-width: 80px;
+    text-align: center;
+}
+
+/* Ensure iframe doesn't gobble clicks if sketch mode is on */
+.iframe-container iframe {
+    position: relative;
+    z-index: 10;
+}
+
 @keyframes fadeInScale {
     from {
         opacity: 0;

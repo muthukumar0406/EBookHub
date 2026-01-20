@@ -38,51 +38,59 @@
                     <span class="icon">📍</span>
                     <span class="label">Mark Page</span>
                 </button>
-            </div>
 
-            <!-- Floating Actions - Bottom Right -->
-            <div class="floating-actions right">
-                <!-- Sketch Toolbar (only visible when active) -->
-                <div class="sketch-toolbar glass" *ngIf="isSketchMode">
-                    <button (click)="setTool('pen')" [class.active]="currentTool === 'pen'" title="Pen">🖊️</button>
-                    <button (click)="setTool('eraser')" [class.active]="currentTool === 'eraser'"
-                        title="Eraser">🧽</button>
-                    <button (click)="clearCanvas()" title="Clear All">🗑️</button>
-                    <button (click)="saveSketch()" class="btn-save" title="Save Sketch">💾 Save</button>
-                </div>
-
-                <button (click)="toggleSketchMode()" class="action-btn pencil" [class.active]="isSketchMode"
-                    title="Sketch Tool">
-                    <span class="icon">{{ isSketchMode ? '✖' : '✏️' }}</span>
-                    <span class="label" *ngIf="!isSketchMode">Sketch</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Resume Prompt Overlay -->
-        <div class="resume-overlay glass" *ngIf="showResumePrompt">
-            <div class="resume-card">
-                <div class="resume-icon">📖</div>
-                <div class="resume-content">
-                    <h4>Pick up where you left off?</h4>
-                    <p>You were last on <strong>Page {{ lastSavedPage }}</strong></p>
-                </div>
-                <div class="resume-actions">
-                    <button (click)="resumeReading()" class="btn-resume">Continue Reading</button>
-                    <button (click)="dismissResume()" class="btn-dismiss">Start from Beginning</button>
+                <!-- PDF Page Controls (Since we can't detect scroll in PDF iframe) -->
+                <div class="pdf-controls glass" *ngIf="!isHtml && fileType === 'PDF'">
+                    <button (click)="scrollToPage(currentPage - 1)" [disabled]="currentPage <= 1"
+                        class="page-nav">◀</button>
+                    <span class="page-num">Page {{ currentPage }}</span>
+                    <button (click)="scrollToPage(currentPage + 1)" class="page-nav">▶</button>
                 </div>
             </div>
         </div>
 
-        <div class="reader-footer" *ngIf="isHtml && totalPages > 0">
-            <div class="page-indicator">
-                Page <span>{{ currentPage }}</span> of <span>{{ totalPages }}</span>
+        <!-- Floating Actions - Bottom Right -->
+        <div class="floating-actions right">
+            <!-- Sketch Toolbar (only visible when active) -->
+            <div class="sketch-toolbar glass" *ngIf="isSketchMode">
+                <button (click)="setTool('pen')" [class.active]="currentTool === 'pen'" title="Pen">🖊️</button>
+                <button (click)="setTool('eraser')" [class.active]="currentTool === 'eraser'" title="Eraser">🧽</button>
+                <button (click)="clearCanvas()" title="Clear All">🗑️</button>
+                <button (click)="saveSketch()" class="btn-save" title="Save Sketch">💾 Save</button>
             </div>
-            <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="(currentPage / totalPages) * 100"></div>
+
+            <button (click)="toggleSketchMode()" class="action-btn pencil" [class.active]="isSketchMode"
+                title="Sketch Tool">
+                <span class="icon">{{ isSketchMode ? '✖' : '✏️' }}</span>
+                <span class="label" *ngIf="!isSketchMode">Sketch</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Resume Prompt Overlay -->
+    <div class="resume-overlay glass" *ngIf="showResumePrompt">
+        <div class="resume-card">
+            <div class="resume-icon">📖</div>
+            <div class="resume-content">
+                <h4>Pick up where you left off?</h4>
+                <p>You were last on <strong>Page {{ lastSavedPage }}</strong></p>
+            </div>
+            <div class="resume-actions">
+                <button (click)="resumeReading()" class="btn-resume">Continue Reading</button>
+                <button (click)="dismissResume()" class="btn-dismiss">Start from Beginning</button>
             </div>
         </div>
     </div>
+
+    <div class="reader-footer" *ngIf="isHtml && totalPages > 0">
+        <div class="page-indicator">
+            Page <span>{{ currentPage }}</span> of <span>{{ totalPages }}</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="(currentPage / totalPages) * 100"></div>
+        </div>
+    </div>
+</div>
 </div>
 
 <div *ngIf="isLoading && !errorMessage" class="loading-state">
