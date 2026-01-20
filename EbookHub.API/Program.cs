@@ -171,10 +171,25 @@ using (var scope = app.Services.CreateScope())
             dbContext.Database.EnsureCreated();
             
             // Hack to add column if it doesn't exist (since EnsureCreated won't update existing tables)
-            try {
-                dbContext.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Books]') AND name = 'CoverImageName') " +
-                                                "ALTER TABLE [dbo].[Books] ADD [CoverImageName] NVARCHAR(MAX) NULL;");
-            } catch { /* Ignore if it fails */ }
+                try {
+                    dbContext.Database.ExecuteSqlRaw("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Books]') AND name = 'CoverImageName') " +
+                                                    "ALTER TABLE [dbo].[Books] ADD [CoverImageName] NVARCHAR(MAX) NULL;");
+                    
+                    dbContext.Database.ExecuteSqlRaw(@"
+                        IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[ReadingProgresses]') AND type in (N'U'))
+                        BEGIN
+                        CREATE TABLE [dbo].[ReadingProgresses] (
+                            [Id] int NOT NULL IDENTITY,
+                            [BookId] int NOT NULL,
+                            [UserId] int NOT NULL,
+                            [LastReadPage] int NOT NULL,
+                            [LastReadAt] datetime2 NOT NULL,
+                            CONSTRAINT [PK_ReadingProgresses] PRIMARY KEY ([Id]),
+                            CONSTRAINT [FK_ReadingProgresses_Books_BookId] FOREIGN KEY ([BookId]) REFERENCES [dbo].[Books] ([Id]) ON DELETE CASCADE,
+                            CONSTRAINT [FK_ReadingProgresses_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users] ([Id]) ON DELETE CASCADE
+                        );
+                        END");
+                } catch { /* Ignore if it fails */ }
 
             logger.LogInformation("Database initialization successful.");
             break;

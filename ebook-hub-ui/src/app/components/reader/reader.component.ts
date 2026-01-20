@@ -23,6 +23,8 @@ export class ReaderComponent implements OnInit {
     currentPage: number = 1;
     totalPages: number = 0;
     isHtml: boolean = false;
+    lastSavedPage: number = 0;
+    showResumePrompt: boolean = false;
 
     constructor(
         private route: ActivatedRoute,
@@ -36,6 +38,12 @@ export class ReaderComponent implements OnInit {
                 this.currentPage = event.data.currentPage;
                 this.totalPages = event.data.totalPages;
                 this.cdr.detectChanges();
+
+                // Auto-save progress for HTML books (only if page changed)
+                if (this.isHtml && this.bookId && this.currentPage !== this.lastSavedPage) {
+                    this.saveReadingProgress(this.currentPage);
+                    this.lastSavedPage = this.currentPage;
+                }
             }
         });
     }
@@ -110,6 +118,10 @@ export class ReaderComponent implements OnInit {
                 // For PDF, we can add #toolbar=0 to make it cleaner, but let's stick to standard first
                 this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fullUrl);
                 this.isLoading = false;
+
+                // Load reading progress
+                this.loadReadingProgress();
+
                 this.cdr.detectChanges();
             },
             error: (err) => {
@@ -233,6 +245,75 @@ export class ReaderComponent implements OnInit {
                 }
             } catch (e) {
                 console.warn('Could not inject into iframe:', e);
+            }
+        }
+    }
+
+    loadReadingProgress() {
+        if (!this.bookId) return;
+
+        this.bookService.getProgress(this.bookId).subscribe({
+            next: (progress) => {
+                if (progress && progress.lastReadPage > 1) {
+                    this.lastSavedPage = progress.lastReadPage;
+                    this.showResumePrompt = true;
+                    this.cdr.detectChanges();
+                }
+            },
+            error: (err) => console.log('No previous progress found or error:', err)
+        });
+    }
+
+    resumeReading() {
+        this.showResumePrompt = false;
+        if (this.lastSavedPage > 1) {
+            this.scrollToPage(this.lastSavedPage);
+        }
+    }
+
+    dismissResume() {
+        this.showResumePrompt = false;
+    }
+
+    saveReadingProgress(page: number) {
+        if (!this.bookId) return;
+        this.bookService.saveProgress(this.bookId, page).subscribe({
+            next: () => console.log('Progress saved:', page),
+            error: (err) => console.error('Error saving progress:', err)
+        });
+    }
+
+    markAsFinished() {
+        if (!this.bookId) return;
+        // User manually marks current page
+        this.saveReadingProgress(this.currentPage);
+        alert(`Progress saved: Page ${this.currentPage}`);
+    }
+
+    scrollToPage(page: number) {
+        this.currentPage = page;
+        const iframe = document.querySelector('iframe');
+        if (iframe) {
+            if (this.isHtml) {
+                try {
+                    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+                    if (doc && iframe.contentWindow) {
+                        const clientHeight = doc.documentElement.clientHeight;
+                        const scrollPosition = (page - 1) * clientHeight;
+                        iframe.contentWindow.scrollTo({
+                            top: scrollPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                } catch (e) {
+                    console.warn('Could not scroll iframe:', e);
+                }
+            } else {
+                // For PDF, we might need to append #page=N to the URL
+                // But this causes iframe reload. 
+                const baseUrl = environment.apiUrl.replace('/api', '');
+                const fullUrl = `${baseUrl}/uploads/${this.book?.fileName}#page=${page}`;
+                this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fullUrl);
             }
         }
     }

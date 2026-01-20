@@ -37,4 +37,12 @@ export class BookService {
     deleteBook(id: number): Observable<any> {
         return this.http.delete(`${this.apiUrl}/${id}`);
     }
+
+    getProgress(bookId: number): Observable<any> {
+        return this.http.get(`${environment.apiUrl}/readingprogress/${bookId}`);
+    }
+
+    saveProgress(bookId: number, page: number): Observable<any> {
+        return this.http.post(`${environment.apiUrl}/readingprogress`, { bookId, lastReadPage: page });
+    }
 }
