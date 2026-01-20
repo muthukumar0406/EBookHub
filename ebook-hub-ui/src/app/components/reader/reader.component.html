@@ -30,16 +30,18 @@
                 (mousemove)="draw($event)" (mouseup)="stopDrawing()" (mouseleave)="stopDrawing()"
                 (touchstart)="handleTouch($event)" (touchmove)="handleTouch($event)" (touchend)="stopDrawing()">
             </canvas>
+        </div>
 
-            <!-- Floating Actions - Bottom Left -->
-            <div class="floating-actions left">
+        <!-- Floating UI Layer -->
+        <div class="reader-floating-ui">
+            <!-- Bottom Left Actions -->
+            <div class="actions-group bottom-left">
                 <button (click)="markAsFinished()" class="action-btn marker"
                     title="Mark current page as end of reading">
                     <span class="icon">📍</span>
                     <span class="label">Mark Page</span>
                 </button>
 
-                <!-- PDF Page Controls (Since we can't detect scroll in PDF iframe) -->
                 <div class="pdf-controls glass" *ngIf="!isHtml && fileType === 'PDF'">
                     <button (click)="scrollToPage(currentPage - 1)" [disabled]="currentPage <= 1"
                         class="page-nav">◀</button>
@@ -47,23 +49,26 @@
                     <button (click)="scrollToPage(currentPage + 1)" class="page-nav">▶</button>
                 </div>
             </div>
-        </div>
 
-        <!-- Floating Actions - Bottom Right -->
-        <div class="floating-actions right">
-            <!-- Sketch Toolbar (only visible when active) -->
-            <div class="sketch-toolbar glass" *ngIf="isSketchMode">
-                <button (click)="setTool('pen')" [class.active]="currentTool === 'pen'" title="Pen">🖊️</button>
-                <button (click)="setTool('eraser')" [class.active]="currentTool === 'eraser'" title="Eraser">🧽</button>
-                <button (click)="clearCanvas()" title="Clear All">🗑️</button>
-                <button (click)="saveSketch()" class="btn-save" title="Save Sketch">💾 Save</button>
+            <!-- Bottom Right Actions -->
+            <div class="actions-group bottom-right">
+                <!-- Sketch Toolbar -->
+                <div class="sketch-toolbar glass" *ngIf="isSketchMode">
+                    <button (click)="setTool('pen')" [class.active]="currentTool === 'pen'" title="Pen">🖊️</button>
+                    <button (click)="setTool('highlighter')" [class.active]="currentTool === 'highlighter'"
+                        title="Highlighter">🖍️</button>
+                    <button (click)="setTool('eraser')" [class.active]="currentTool === 'eraser'"
+                        title="Eraser">🧽</button>
+                    <button (click)="clearCanvas()" title="Clear All">🗑️</button>
+                    <button (click)="saveSketch()" class="btn-save" title="Save Sketch">💾 Save</button>
+                </div>
+
+                <button (click)="toggleSketchMode()" class="action-btn pencil" [class.active]="isSketchMode"
+                    title="Sketch Tool">
+                    <span class="icon">{{ isSketchMode ? '✖' : '✏️' }}</span>
+                    <span class="label" *ngIf="!isSketchMode">Sketch</span>
+                </button>
             </div>
-
-            <button (click)="toggleSketchMode()" class="action-btn pencil" [class.active]="isSketchMode"
-                title="Sketch Tool">
-                <span class="icon">{{ isSketchMode ? '✖' : '✏️' }}</span>
-                <span class="label" *ngIf="!isSketchMode">Sketch</span>
-            </button>
         </div>
     </div>
 

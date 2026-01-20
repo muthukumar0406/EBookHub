@@ -25,8 +25,9 @@ export class ReaderComponent implements OnInit {
     isHtml: boolean = false;
     lastSavedPage: number = 0;
     showResumePrompt: boolean = false;
+    showResumePrompt: boolean = false;
     isSketchMode: boolean = false;
-    currentTool: 'pen' | 'eraser' = 'pen';
+    currentTool: 'pen' | 'highlighter' | 'eraser' = 'pen';
     @ViewChild('sketchCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
     private ctx!: CanvasRenderingContext2D;
     private isDrawing: boolean = false;
@@ -133,8 +134,12 @@ export class ReaderComponent implements OnInit {
                 if (extension === 'pdf') {
                     this.isHtml = false;
                     this.currentPage = 1;
-                    this.totalPages = 0; // Unknown for direct iframe PDF
-                    this.loadSketches(); // Load for initial page
+                    this.totalPages = 0;
+                    // Small delay to ensure view is ready
+                    setTimeout(() => {
+                        this.initCanvas();
+                        this.loadSketches();
+                    }, 500);
                 }
 
                 this.cdr.detectChanges();
@@ -282,6 +287,7 @@ export class ReaderComponent implements OnInit {
     resumeReading() {
         this.showResumePrompt = false;
         if (this.lastSavedPage > 1) {
+            this.currentPage = this.lastSavedPage;
             this.scrollToPage(this.lastSavedPage);
         }
     }
@@ -307,6 +313,7 @@ export class ReaderComponent implements OnInit {
 
     scrollToPage(page: number) {
         if (!this.book) return;
+        if (page < 1) page = 1;
         this.currentPage = page;
         const iframe = document.querySelector('iframe');
 
@@ -329,11 +336,13 @@ export class ReaderComponent implements OnInit {
                     console.warn('Could not scroll iframe:', e);
                 }
             } else {
-                // For PDF, we might need to append #page=N to the URL
-                // But this causes iframe reload. 
+                // For PDF, we append #page=N to the URL
                 const baseUrl = environment.apiUrl.replace('/api', '');
                 const fullUrl = `${baseUrl}/uploads/${this.book?.fileName}#page=${page}`;
                 this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fullUrl);
+
+                // Re-init canvas after PDF reload
+                setTimeout(() => this.initCanvas(), 1000);
             }
         }
     }
@@ -347,7 +356,7 @@ export class ReaderComponent implements OnInit {
         }
     }
 
-    setTool(tool: 'pen' | 'eraser') {
+    setTool(tool: 'pen' | 'highlighter' | 'eraser') {
         this.currentTool = tool;
     }
 
@@ -374,19 +383,25 @@ export class ReaderComponent implements OnInit {
     }
 
     draw(event: MouseEvent) {
-        if (!this.isDrawing || !this.isSketchMode) return;
+        if (!this.isDrawing) return;
         const rect = this.canvasRef.nativeElement.getBoundingClientRect();
-
-        this.ctx.lineWidth = this.currentTool === 'pen' ? 3 : 20;
-        this.ctx.strokeStyle = this.currentTool === 'pen' ? '#ef4444' : '#ffffff'; // White as eraser on white background
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
 
         if (this.currentTool === 'eraser') {
             this.ctx.globalCompositeOperation = 'destination-out';
+            this.ctx.lineWidth = 30;
+        } else if (this.currentTool === 'highlighter') {
+            this.ctx.globalCompositeOperation = 'source-over';
+            this.ctx.lineWidth = 25;
+            this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.4)'; // Semi-transparent yellow
         } else {
             this.ctx.globalCompositeOperation = 'source-over';
+            this.ctx.lineWidth = 3;
+            this.ctx.strokeStyle = '#ef4444'; // Red for pen
         }
 
-        this.ctx.lineTo(event.clientX - rect.left, event.clientY - rect.top);
+        this.ctx.lineTo(x, y);
         this.ctx.stroke();
     }
 
@@ -396,7 +411,6 @@ export class ReaderComponent implements OnInit {
     }
 
     handleTouch(event: TouchEvent) {
-        if (!this.isSketchMode) return;
         event.preventDefault();
         const touch = event.touches[0];
         const rect = this.canvasRef.nativeElement.getBoundingClientRect();
@@ -408,8 +422,18 @@ export class ReaderComponent implements OnInit {
             this.ctx.beginPath();
             this.ctx.moveTo(x, y);
         } else if (event.type === 'touchmove' && this.isDrawing) {
-            this.ctx.lineWidth = this.currentTool === 'pen' ? 3 : 20;
-            this.ctx.strokeStyle = this.currentTool === 'pen' ? '#ef4444' : '#ffffff';
+            if (this.currentTool === 'eraser') {
+                this.ctx.globalCompositeOperation = 'destination-out';
+                this.ctx.lineWidth = 30;
+            } else if (this.currentTool === 'highlighter') {
+                this.ctx.globalCompositeOperation = 'source-over';
+                this.ctx.lineWidth = 25;
+                this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.4)';
+            } else {
+                this.ctx.globalCompositeOperation = 'source-over';
+                this.ctx.lineWidth = 3;
+                this.ctx.strokeStyle = '#ef4444';
+            }
             this.ctx.lineTo(x, y);
             this.ctx.stroke();
         }
@@ -435,11 +459,7 @@ export class ReaderComponent implements OnInit {
     loadSketches() {
         if (!this.bookId) return;
 
-        // We want to load sketches even if not in sketch mode yet, 
-        // to show them if the user enters sketch mode on this page.
-        // Actually, we should probably only clear and draw if context exists.
         if (!this.ctx) {
-            // If ctx doesn't exist yet (sketch mode off), we just wait.
             return;
         }
 
@@ -449,12 +469,14 @@ export class ReaderComponent implements OnInit {
                 if (sketches && sketches.length > 0) {
                     const img = new Image();
                     img.onload = () => {
+                        this.ctx.globalCompositeOperation = 'source-over';
                         this.ctx.drawImage(img, 0, 0);
+                        this.cdr.detectChanges();
                     };
                     img.src = sketches[0].canvasData;
                 }
             },
-            error: (err) => console.log('No sketches found or error:', err)
+            error: (err) => console.log('No sketches found for current page.')
         });
     }
 }
