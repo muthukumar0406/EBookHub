@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -25,6 +25,11 @@ export class ReaderComponent implements OnInit {
     isHtml: boolean = false;
     lastSavedPage: number = 0;
     showResumePrompt: boolean = false;
+    isSketchMode: boolean = false;
+    currentTool: 'pen' | 'eraser' = 'pen';
+    @ViewChild('sketchCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+    private ctx!: CanvasRenderingContext2D;
+    private isDrawing: boolean = false;
 
     constructor(
         private route: ActivatedRoute,
@@ -43,6 +48,8 @@ export class ReaderComponent implements OnInit {
                 if (this.isHtml && this.bookId && this.currentPage !== this.lastSavedPage) {
                     this.saveReadingProgress(this.currentPage);
                     this.lastSavedPage = this.currentPage;
+                    // Load sketches for new page
+                    this.loadSketches();
                 }
             }
         });
@@ -293,6 +300,10 @@ export class ReaderComponent implements OnInit {
     scrollToPage(page: number) {
         this.currentPage = page;
         const iframe = document.querySelector('iframe');
+
+        // Load sketches for the new page
+        this.loadSketches();
+
         if (iframe) {
             if (this.isHtml) {
                 try {
@@ -316,5 +327,116 @@ export class ReaderComponent implements OnInit {
                 this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fullUrl);
             }
         }
+    }
+
+    // --- Sketching Logic ---
+
+    toggleSketchMode() {
+        this.isSketchMode = !this.isSketchMode;
+        if (this.isSketchMode) {
+            setTimeout(() => this.initCanvas(), 100);
+        }
+    }
+
+    setTool(tool: 'pen' | 'eraser') {
+        this.currentTool = tool;
+    }
+
+    private initCanvas() {
+        const canvas = this.canvasRef.nativeElement;
+        this.ctx = canvas.getContext('2d')!;
+
+        // Match canvas size to container
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+
+        this.loadSketches();
+    }
+
+    startDrawing(event: MouseEvent) {
+        if (!this.isSketchMode) return;
+        this.isDrawing = true;
+        const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+        this.ctx.beginPath();
+        this.ctx.moveTo(event.clientX - rect.left, event.clientY - rect.top);
+    }
+
+    draw(event: MouseEvent) {
+        if (!this.isDrawing || !this.isSketchMode) return;
+        const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+
+        this.ctx.lineWidth = this.currentTool === 'pen' ? 3 : 20;
+        this.ctx.strokeStyle = this.currentTool === 'pen' ? '#ef4444' : '#ffffff'; // White as eraser on white background
+
+        if (this.currentTool === 'eraser') {
+            this.ctx.globalCompositeOperation = 'destination-out';
+        } else {
+            this.ctx.globalCompositeOperation = 'source-over';
+        }
+
+        this.ctx.lineTo(event.clientX - rect.left, event.clientY - rect.top);
+        this.ctx.stroke();
+    }
+
+    stopDrawing() {
+        this.isDrawing = false;
+        this.ctx.globalCompositeOperation = 'source-over'; // Reset
+    }
+
+    handleTouch(event: TouchEvent) {
+        if (!this.isSketchMode) return;
+        event.preventDefault();
+        const touch = event.touches[0];
+        const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+
+        if (event.type === 'touchstart') {
+            this.isDrawing = true;
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, y);
+        } else if (event.type === 'touchmove' && this.isDrawing) {
+            this.ctx.lineWidth = this.currentTool === 'pen' ? 3 : 20;
+            this.ctx.strokeStyle = this.currentTool === 'pen' ? '#ef4444' : '#ffffff';
+            this.ctx.lineTo(x, y);
+            this.ctx.stroke();
+        }
+    }
+
+    clearCanvas() {
+        if (!this.ctx) return;
+        this.ctx.clearRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height);
+    }
+
+    saveSketch() {
+        if (!this.bookId) return;
+        const data = this.canvasRef.nativeElement.toDataURL(); // Save as image data
+        this.bookService.saveSketch(this.bookId, this.currentPage, data).subscribe({
+            next: () => {
+                console.log('Sketch saved');
+                alert('Sketch saved for this page!');
+            },
+            error: (err) => console.error('Error saving sketch:', err)
+        });
+    }
+
+    loadSketches() {
+        if (!this.bookId || !this.isSketchMode) return;
+        this.clearCanvas();
+        this.bookService.getSketches(this.bookId, this.currentPage).subscribe({
+            next: (sketches) => {
+                if (sketches && sketches.length > 0) {
+                    const img = new Image();
+                    img.onload = () => {
+                        this.ctx.drawImage(img, 0, 0);
+                    };
+                    img.src = sketches[0].canvasData;
+                }
+            },
+            error: (err) => console.log('No sketches found or error:', err)
+        });
     }
 }

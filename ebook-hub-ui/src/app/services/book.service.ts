@@ -45,4 +45,12 @@ export class BookService {
     saveProgress(bookId: number, page: number): Observable<any> {
         return this.http.post(`${environment.apiUrl}/readingprogress`, { bookId, lastReadPage: page });
     }
+
+    getSketches(bookId: number, page: number): Observable<any> {
+        return this.http.get(`${environment.apiUrl}/sketches/${bookId}/${page}`);
+    }
+
+    saveSketch(bookId: number, page: number, data: string): Observable<any> {
+        return this.http.post(`${environment.apiUrl}/sketches`, { bookId, pageNumber: page, canvasData: data });
+    }
 }

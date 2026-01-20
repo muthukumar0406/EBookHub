@@ -189,6 +189,22 @@ using (var scope = app.Services.CreateScope())
                             CONSTRAINT [FK_ReadingProgresses_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users] ([Id]) ON DELETE CASCADE
                         );
                         END");
+
+                    dbContext.Database.ExecuteSqlRaw(@"
+                        IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Sketches]') AND type in (N'U'))
+                        BEGIN
+                        CREATE TABLE [dbo].[Sketches] (
+                            [Id] int NOT NULL IDENTITY,
+                            [BookId] int NOT NULL,
+                            [UserId] int NOT NULL,
+                            [PageNumber] int NOT NULL,
+                            [CanvasData] nvarchar(max) NOT NULL,
+                            [CreatedAt] datetime2 NOT NULL,
+                            CONSTRAINT [PK_Sketches] PRIMARY KEY ([Id]),
+                            CONSTRAINT [FK_Sketches_Books_BookId] FOREIGN KEY ([BookId]) REFERENCES [dbo].[Books] ([Id]) ON DELETE CASCADE,
+                            CONSTRAINT [FK_Sketches_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users] ([Id]) ON DELETE CASCADE
+                        );
+                        END");
                 } catch { /* Ignore if it fails */ }
 
             logger.LogInformation("Database initialization successful.");

@@ -13,6 +13,7 @@ namespace EbookHub.API.Data
         public DbSet<Book> Books { get; set; }
         public DbSet<Highlight> Highlights { get; set; }
         public DbSet<ReadingProgress> ReadingProgresses { get; set; }
+        public DbSet<Sketch> Sketches { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
